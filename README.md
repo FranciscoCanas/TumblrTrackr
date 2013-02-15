@@ -1,4 +1,7 @@
 csc309-a2
 =========
 
-A2 for Web Programming Class: The Tumblr Tracker
+The Tumblr Tracker: A CSC309 Web Programming Assignment
+
+Group:
+Francisco Canas (g1canasf)
