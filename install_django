@@ -1,0 +1,28 @@
+1) Download latest version from https://www.djangoproject.com/download/. 
+
+2) Save to a folder somewhere.
+
+Now do the following in a console with black bacground and green fonts, so it looks like you're hacking the matrix an' shit.
+
+3) Open console, go to folder, type: 
+tar xzvf Django-1.4.3
+
+4) Go: cd Django-1.4.3
+type: python setup.py install --user
+
+5) Now go to your home folder and add the django binary path to your PATH:
+cd ~
+gedit .cshrc &
+setenv PATH $HOME/<Path to your django>/Django-1.4.3/django/django/bin:$PATH
+
+NO TYPOS!
+
+6) Save, exit, restart a terminal, then type:
+django-admin.py --version
+If you get 1.4.3 or some such thing, you're sittin' pretty and can move to this tutorial:
+
+https://docs.djangoproject.com/en/1.4/intro/tutorial01/
+
+If that didn't work, you probably set your PATH wrong. Ask Sasa to fix it for you.
+
+Done.
