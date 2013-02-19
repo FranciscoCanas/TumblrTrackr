@@ -7,3 +7,5 @@ Group:
 Francisco Canas (g1canasf)
 
 Zizhou Wang (g2zizhou)
+
+Zhanara Orazbayeva (g2zhan)
