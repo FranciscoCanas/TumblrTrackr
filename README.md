@@ -19,8 +19,10 @@ FILE TREE:
 	trackr/ -- Folder containing project source files.
 		__init__.py -- Empty file. Informs python this folder is a package.
 		settings.py -- Configuration file for project.
-		urls.py -- Table of contents for the trackr website.
+		urls.py -- Contains the URL service request router code!
 		wsgi.py -- For WSGI projects. Don't need it for Trackr.
+		handlers.py -- Code for our request handlers lives here.
+		tracker.py -- Code for our blog tracking lives here.
 
 
 
