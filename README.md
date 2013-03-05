@@ -23,6 +23,7 @@ FILE TREE:
 		wsgi.py -- For WSGI projects. Don't need it for Trackr.
 		handlers.py -- Code for our request handlers lives here.
 		tracker.py -- Code for our blog tracking lives here.
+		models.py -- Classes defined for the database to be created on syncdb
 
 
 
