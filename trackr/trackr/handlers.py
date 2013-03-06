@@ -6,7 +6,7 @@ from models import *
 
 ''' Add a new blog to our tracking list.'''	
 def add_blog(request):
-	blog_name = request.POST['blog']
+	blog_name = request.REQUEST['blog'] # Using .REQUEST instead of .POST for testing
 	b = Blog(host_name = blog_name)
 	b.save()
 	return HttpResponse(blog_name)

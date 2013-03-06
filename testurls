@@ -1,3 +1,3 @@
-/blog?blog=myhost
-/blog/myhost/trends
-/blogs/trends
+/blog?blog=myblog
+/blog/myblog/trends?limit=5&order=true
+/blogs/trends?limit=3
