@@ -1,6 +1,5 @@
 from django.http import HttpResponse
-from models import *
-import datetimes
+from trackr.models import *
 
 
 ''' Add a new blog to our tracking list.'''	
@@ -24,6 +23,6 @@ def get_trends(request):
 	order = request.GET['order']
 	stuff = ""
 	# Fill this here in. With code.
-	return HttpResponse(stuff
+	return HttpResponse(stuff)
 
 
