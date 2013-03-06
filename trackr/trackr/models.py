@@ -6,7 +6,8 @@ class Post(models.Model):
     url = models.TextField()
     date = models.TextField() # 
     image = models.TextField() # This is a url to the img
-    note_count = models.TextField()
+    note_count = models.IntegerField()
+    prev_note_count = models.IntegerField()
     text = models.TextField()
     
     def __unicode__(self):

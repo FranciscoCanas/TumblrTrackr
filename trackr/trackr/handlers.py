@@ -1,4 +1,6 @@
 from django.http import HttpResponse
+from django.db.models import Max
+from django.core.exceptions import ObjectDoesNotExist
 from trackr.models import *
 import datetimes
 
@@ -14,9 +16,17 @@ def add_blog(request):
 def get_blog_trends(request, blog_name):
 	limit = request.GET['limit']
 	order = request.GET['order']
+	if order == "trending":
+		try:
+			allpost = Post.objects.get(blog_id = blog_name)
+			largest_inc = allpost.objects.all().aggregate(
+				Max('note_count'-'prev_note_count'))
+			allpost.objects.get(largest_inc = 'note_count'-'prev_note_count')
+		except ObjectDoesNotExist:
+			return HttpResponse(404)
+	return HttpResponse(200)
 	
 	
-	return HttpResponse(stuff)
 
 def get_trends(request):
 	''' Send trending data for all blogs.'''
