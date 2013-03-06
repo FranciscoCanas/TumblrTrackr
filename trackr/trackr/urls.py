@@ -11,5 +11,5 @@ urlpatterns = patterns('',
     # ex: /blog/deezcouches/trends
 	url(r'^blog/(?P<blog_name>)/trends$', 'handlers.get_blog_trends'),
 	# ex: /blogs/trends
-	url(r'^blog/trends$', 'handlers.get_trends')
+	url(r'^blogs/trends$', 'handlers.get_trends')
 )

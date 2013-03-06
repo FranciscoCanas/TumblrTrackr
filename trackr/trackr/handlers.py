@@ -22,4 +22,6 @@ def get_trends(request):
 	order = request.GET['order']
 	stuff = ""
 	# Fill this here in. With code.
-	return HttpResponse(stuff)
+	return HttpResponse(stuff
+
+
