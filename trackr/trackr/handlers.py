@@ -8,15 +8,15 @@ def add_blog(request):
 	blog_name = request.POST['blog']
 	b = Blog(host_name = blog_name)
 	b.save()
-	# Fill this here in. With code.
-    return HttpResponse(stuff)
+	return HttpResponse(blog_name)
 
 ''' Send trend data for some specific tumblr blog.'''
 def get_blog_trends(request, blog_name):
 	limit = request.GET['limit']
 	order = request.GET['order']
-	stuff = ""
-	# Fill this here in. With code.
+	if order == "trending":
+		request
+	
 	return HttpResponse(stuff)
 
 def get_trends(request):

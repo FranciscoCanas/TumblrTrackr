@@ -20,7 +20,4 @@ class Blog(models.Model):
         return self.host_name
     
     
-b = Blog(host_name = 'douche')
-b.save()
-    
 
