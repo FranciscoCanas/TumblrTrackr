@@ -9,10 +9,12 @@ def track(request):
 	blog_name = request.REQUEST.get('blog', '')
 	if blog_name:
 		_request_likes(blog_name)
+		response = "Retrieving Likes for " + blog_name
 	else:
 		retrieve_likes()
+		response = "Retrieving Likes for All Blogs"
 
-	return HttpResponse(blog_name)
+	return HttpResponse(response)
 
 def retrieve_likes():
     ''' Retrieve a list of liked posts:
