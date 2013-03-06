@@ -1,17 +1,15 @@
 from django.conf.urls import patterns, include, url
+import handlers
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
 # admin.autodiscover()
 
 urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'trackr.views.home', name='home'),
-    # url(r'^trackr/', include('trackr.foo.urls')),
-
-    # Uncomment the admin/doc line below to enable admin documentation:
-    # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
-    # Uncomment the next line to enable the admin:
-    # url(r'^admin/', include(admin.site.urls)),
+	# ex: /blog
+	url(r'^blog$', 'handlers.add_blog'),
+    # ex: /blog/deezcouches/trends
+	url(r'^blog/(?P<blog_name>)/trends$', 'handlers.get_blog_trends'),
+	# ex: /blogs/trends
+	url(r'^blog/trends$', 'handlers.get_trends')
 )

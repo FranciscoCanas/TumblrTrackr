@@ -1,20 +1,25 @@
 from django.http import HttpResponse
 import datetime
 
-def AddBlogToTrack(request):
-	''' Add a new blog to our tracking list.'''		
+''' Add a new blog to our tracking list.'''	
+def add_blog(request):
+	blog_name = request.POST['blog']
 	stuff = ""
 	# Fill this here in. With code.
     return HttpResponse(stuff)
 
-def GetBlogTrends(request):
-	''' Send trend data for some specific tumblr blog.'''
+''' Send trend data for some specific tumblr blog.'''
+def get_blog_trends(request, blog_name):
+	limit = request.GET['limit']
+	order = request.GET['order']
 	stuff = ""
 	# Fill this here in. With code.
 	return HttpResponse(stuff)
 
-def GetTrends(request):
+def get_trends(request):
 	''' Send trending data for all blogs.'''
+	limit = request.GET['limit']
+	order = request.GET['order']
 	stuff = ""
 	# Fill this here in. With code.
 	return HttpResponse(stuff)
