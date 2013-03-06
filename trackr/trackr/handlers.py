@@ -6,7 +6,8 @@ import datetimes
 ''' Add a new blog to our tracking list.'''	
 def add_blog(request):
 	blog_name = request.POST['blog']
-	stuff = ""
+	b = Blog(host_name = blog_name)
+	b.save()
 	# Fill this here in. With code.
     return HttpResponse(stuff)
 
