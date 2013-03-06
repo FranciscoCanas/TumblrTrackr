@@ -9,7 +9,9 @@ urlpatterns = patterns('',
 	# ex: /blog
 	url(r'^blog$', handlers.add_blog),
     # ex: /blog/deezcouches/trends
+
 	url(r'^blog/(?P<blog_name>\w+)/trends$', handlers.get_blog_trends),
+
 	# ex: /blogs/trends
 	url(r'^blogs/trends$', handlers.get_trends)
 )
