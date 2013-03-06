@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.db.models import Max
 from django.core.exceptions import ObjectDoesNotExist
 from trackr.models import *
+from models import *
 import datetimes
 
 
@@ -34,4 +35,6 @@ def get_trends(request):
 	order = request.GET['order']
 	stuff = ""
 	# Fill this here in. With code.
-	return HttpResponse(stuff)
+	return HttpResponse(stuff
+
+
