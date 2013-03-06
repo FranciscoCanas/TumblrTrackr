@@ -1,11 +1,11 @@
 from django.http import HttpResponse
-import datetime
+from trackr.models import *
+import datetimes
 
-def AddBlogToTrack(request):
+def AddBlogToTrack(blog_name):
 	''' Add a new blog to our tracking list.'''		
-	stuff = ""
-	# Fill this here in. With code.
-    return HttpResponse(stuff)
+	blog = Blog(host_name = blog_name, likes=blank)
+	return HttpResponse(200)
 
 def GetBlogTrends(request):
 	''' Send trend data for some specific tumblr blog.'''
