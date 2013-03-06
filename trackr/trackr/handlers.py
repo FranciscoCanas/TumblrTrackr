@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from trackr.models import *
+from models import *
 import datetimes
 
 
