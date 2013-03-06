@@ -14,8 +14,7 @@ def add_blog(request):
 def get_blog_trends(request, blog_name):
 	limit = request.GET['limit']
 	order = request.GET['order']
-	if order == "trending":
-		request
+	
 	
 	return HttpResponse(stuff)
 
