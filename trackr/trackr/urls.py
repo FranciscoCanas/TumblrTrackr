@@ -14,10 +14,10 @@ urlpatterns = patterns('',
 	url(r'^blog/(?P<blog_name>\w+)/trends$', handlers.get_blog_trends),
 
 	# ex: /blogs/trends
-	url(r'^blogs/trends$', handlers.get_trends)
+	url(r'^blogs/trends$', handlers.get_trends),
 
 	# Used for manually starting a tracking go go machine sandwich
-	url(r'^track$',tracker.track) 
+	url(r'^track$', tracker.track) 
 )
 
 

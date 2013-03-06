@@ -2,12 +2,17 @@ from django.http import HttpResponse
 import datetime
 import project_vars
 import requests
-from models import Blogs, Post
+from models import Blog, Post
 
-def track():
+def track(request):
 	''' Used to manually start the tracking process for testing'''
-	retrieve_likes()
-	return
+	blog_name = request.REQUEST.get('blog', '')
+	if blog_name:
+		_request_likes(blog_name)
+	else:
+		retrieve_likes()
+
+	return HttpResponse(blog_name)
 
 def retrieve_likes():
     ''' Retrieve a list of liked posts:
@@ -21,9 +26,9 @@ def retrieve_likes():
         - liked_count: Total number of liked posts.'''		
 
 	# For each blog in Blogs:
-    for blog in Blogs.objects.all():
+    for blog in Blog.objects.all():
         # Send AJAX request to tumblr.com. 
-        _request_likes(base_blog)        
+        _request_likes(blog)        
     return
 
 def _request_likes(base_blog):
