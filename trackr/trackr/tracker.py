@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 import datetime
-from project_vars import *
-from models import *
+import project_vars
+from models import Blogs, Post
 
 def RetrieveLikes():
     ''' Retrieve a list of liked posts:

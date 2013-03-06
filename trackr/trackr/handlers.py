@@ -1,7 +1,6 @@
 from django.http import HttpResponse
 from trackr.models import *
 
-
 ''' Add a new blog to our tracking list.'''	
 def add_blog(request):
 	blog_name = request.POST['blog']
@@ -13,8 +12,7 @@ def add_blog(request):
 def get_blog_trends(request, blog_name):
 	limit = request.GET['limit']
 	order = request.GET['order']
-	
-	
+	stuff=limit + ' ' + order
 	return HttpResponse(stuff)
 
 def get_trends(request):
