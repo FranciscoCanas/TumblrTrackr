@@ -15,12 +15,10 @@ def add_blog(request):
 def get_blog_trends(request, blog_name):
 	limit = request.GET['limit']
 	order = request.GET['order']
-	if order == "trending":
+	if order == "Trending":
 		try:
-			allpost = Post.objects.get(blog_id = blog_name)
-			largest_inc = allpost.objects.all().aggregate(
-				Max('note_count'-'prev_note_count'))
-			allpost.objects.get(largest_inc = 'note_count'-'prev_note_count')
+			blog_obj = Blog.objects.get(host_name=blog_name)
+			blog_likes = blog_obj.likes.order_by('-note_inc')[0:limit]
 		except ObjectDoesNotExist:
 			return HttpResponse(404)
 	return HttpResponse(200)
