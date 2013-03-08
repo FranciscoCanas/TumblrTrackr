@@ -2,12 +2,14 @@
 # 'trackr_[class name], ex. class Blog will be created as trackr_blog.
 
 from django.db import models
+#Table that contains tracking infomation on all the psots
 class Tracking(models.Model):
     timestamp = models.DateField()
     sequence = models.IntegerField()
     increment = models.IntegerField()
     count = models.IntegerField()
 
+#Table that contains all the posts being tracked
 class Post(models.Model):
     url = models.TextField()
     date = models.DateField() # 
@@ -21,7 +23,7 @@ class Post(models.Model):
     def __unicode__(self):
         return self.url
 
-
+#Table of all the blogs being tracked
 class Blog(models.Model):
     host_name = models.TextField(primary_key=True)
     likes = models.ManyToManyField(Post)
