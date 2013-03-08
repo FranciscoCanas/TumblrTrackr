@@ -15,6 +15,8 @@ def track(request):
     blog_name = request.REQUEST.get('blog', '')
     if blog_name:
         # Used for tracking a single blog_name for testing
+        # TODO: Check that the blog hasn't been tracked in the last hour
+        # first
         response = [_request_likes(blog_name)]
     else:
         # Used for starting the massive blog tracking batch job
@@ -56,7 +58,7 @@ def _request_likes(blog_host_name):
 
     if (ret)==200:
         # Response OK, so parse json for juicy goodness
-        _parse_likes_json(blog_host_name, json)
+        errcode = _parse_likes_json(blog_host_name, json)
         
     return (blog_host_name, ret)
 
@@ -70,6 +72,8 @@ def _parse_likes_json(blog_host_name, likes_json):
 
     # Find the blog in the database, and start updating it:
     # Necessary? Only if we need to modify the blog here.
+    # Otherwise we need it in _parse_post_json below so as to 
+    # add this particular post to this blog's likes.
     try:
         blog_obj = Blog.objects.get(host_name=blog_host_name)
     except ObjectDoesNotExist:
@@ -77,14 +81,16 @@ def _parse_likes_json(blog_host_name, likes_json):
 
     # For each post in the 'likes', extract its json object and handle it:
     for liked_post in likes_json['response']['liked_posts']:
-        _parse_post_json(blog_host_name, liked_post)
+        errcode = _parse_post_json(blog_host_name, liked_post)
     
-    return
+    return (blog_host_name, 200)
+
 
 def _likes_request_str(blog_host_name):
     ''' Returns a string with the request for gettin' likes, baby. For example:
     http://api.tumblr.com/v2/blog/artgalleryofontario.tumblr.com/likes?api_key=
         UVsuuWUK99CX70DXIKylXXoCVo1QPvYzYPxKzN0GLTVxyd26bx'''
+
     return  pv.tumblr_url + 'blog/' + blog_host_name + \
             '/likes?api_key=' + pv.api_key 
 
@@ -104,15 +110,20 @@ def _response_list_to_str(response_list):
 ################################
 # Retrieving details for posts
 ################################
-def retrieve_post_details(post):
+def retrieve_post_details(post_id):
     ''' Retrieve details for some post.'''
-    # Fill this here in. With code. 
-    return
+    # TODO: pull post url from the database based on its id
+    # then make the request to tumblr.com to get the post
+    # object in json format. Then call _parse_post_json()
+    # to do the rest.
+    return 0
 
 def _parse_post_json(blog_host_name, liked_post):
     ''' Takes the json from a post and extracts all its juicy goodness, then
         makes a database entry for it, if necessary.'''
-    return
+    # TODO: Check if post is already in db, and check if it's already 
+    # marked as 'liked' by the given blog. Modify db as necessary.
+    return 0
 
 def _post_request_str(blog_host_name, post_id):
     ''' Returns a string with the request for gettin' a post.

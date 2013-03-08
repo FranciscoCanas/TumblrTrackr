@@ -25,6 +25,7 @@ class Post(models.Model):
 class Blog(models.Model):
     host_name = models.TextField(primary_key=True)
     likes = models.ManyToManyField(Post)
+    timestamp = models.DateTimeField() # Use to determine last track time
     
     def __unicode__(self):
         return self.host_name
