@@ -39,8 +39,7 @@ Now go to some arbitrary folder, start python's interpreter, and try to 'import 
 ########## How to use REQUESTS from the command line:
 Open up python interpreter.
 import requests
-r=requests.get('http://api.tumblr.com/v2/blog/artgalleryofontario.tumblr.com/likes?api_key=
-        UVsuuWUK99CX70DXIKylXXoCVo1QPvYzYPxKzN0GLTVxyd26bx')
+r=requests.get('http://api.tumblr.com/v2/blog/artgalleryofontario.tumblr.com/likes?api_key=UVsuuWUK99CX70DXIKylXXoCVo1QPvYzYPxKzN0GLTVxyd26bx')
 j=r.json()
 j['meta'] # The meta response info
 j['response'] # The actual response
