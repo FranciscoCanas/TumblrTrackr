@@ -33,14 +33,21 @@ def get_blog_trends(request, blog_name):
 				json["trending"].append(trending)
 		except ObjectDoesNotExist:
 			return HttpResponse(404)
+	elif order == "Recent":
+		pass
 	return HttpResponse(200)
 	
-
+'''Send trends from all blogs that the user is subsribed to'''
 def get_trends(request):
 	''' Send trending data for all blogs.'''
-	limit = request.GET['limit']
+	limit = request.GET.get('limit', 7)
 	order = request.GET['order']
-	stuff = ""
+	if order == 'Trending':
+		stuff = "Trending"
+	elif order == "Recent":
+		stuff = "Recent"
+	else:
+		return HttpResponse(200)
 	# Fill this here in. With code.
 	return HttpResponse(stuff)
 
