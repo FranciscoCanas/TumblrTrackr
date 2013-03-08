@@ -26,3 +26,42 @@ https://docs.djangoproject.com/en/1.4/intro/tutorial01/
 If that didn't work, you probably set your PATH wrong. Ask Sasa to fix it for you.
 
 Done.
+
+### Installing Requests: HTTP for humans ###
+1) Go to your root CSC309 folder, or somewhere else safe.
+2) Type: curl -OL https://github.com/kennethreitz/requests/tarball/master
+3) Once the file has downloaded, type: tar -xvf master
+4) Once the file has extracted, type: cd kennethreitz-requests-13de692/
+5) Install it with: python setup.py install --user
+
+Now go to some arbitrary folder, start python's interpreter, and try to 'import requests' to make sure it works... should be set. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
