@@ -18,11 +18,11 @@ def get_blog_trends(request, blog_name):
 	order = request.GET['order']
 	json = {"trending" : [], 
 	        "order": order, 
-	        "limit": limit}
+	        "limit": limit} #Initializes a JSON object to track all posts liked by a blog
 	if order == "Trending":
 		try:
-			blog_obj = Blog.objects.get(host_name=blog_name)
-			blog_likes = blog_obj.likes.order_by('-note_inc')[0:limit]
+			blog_obj = Blog.objects.get(host_name = blog_name) #Gets a Blog object in database with blog_name as host_name
+			blog_likes = blog_obj.likes.order_by('-note_inc')[0:limit] #QuerySet of liked posts with most note_count
 			for post in blog_likes:
 				trending = {"url": post.url,
 				            "image": post.image,
