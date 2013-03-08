@@ -15,7 +15,7 @@ def add_blog(request):
 def get_blog_trends(request, blog_name):
 	limit = request.GET['limit']
 	order = request.GET['order']
-	if order == "trending":
+	if order == "Trending":
 		try:
 			allpost = Post.objects.get(blog_id = blog_name)
 			largest_inc = allpost.objects.all().aggregate(
@@ -25,12 +25,17 @@ def get_blog_trends(request, blog_name):
 			return HttpResponse(404)
 	return HttpResponse(200)
 	
-
+'''Send trends from all blogs that the user is subsribed to'''
 def get_trends(request):
 	''' Send trending data for all blogs.'''
-	limit = request.GET['limit']
+	limit = request.GET.get('limit', 7)
 	order = request.GET['order']
-	stuff = ""
+	if order == 'Trending':
+		stuff = "Trending"
+	elif order == "Recent":
+		stuff = "Recent"
+	else:
+		return HttpResponse(200)
 	# Fill this here in. With code.
 	return HttpResponse(stuff)
 
