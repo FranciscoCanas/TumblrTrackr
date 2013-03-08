@@ -2,9 +2,10 @@
 # 'trackr_[class name], ex. class Blog will be created as trackr_blog.
 
 from django.db import models
+from django.http import HttpResponse
 #Table that contains tracking infomation on all the psots
 class Tracking(models.Model):
-    timestamp = models.DateField()
+    timestamp = models.TextField()
     sequence = models.IntegerField()
     increment = models.IntegerField()
     count = models.IntegerField()
@@ -12,8 +13,8 @@ class Tracking(models.Model):
 #Table that contains all the posts being tracked
 class Post(models.Model):
     url = models.TextField()
-    date = models.DateField() # 
-    last_track = models.DateField()
+    date = models.TextField() # 
+    last_track = models.extField()
     image = models.TextField() # This is a url to the img
     note_count = models.IntegerField()
     note_inc = models.IntegerField()
@@ -27,7 +28,8 @@ class Post(models.Model):
 class Blog(models.Model):
     host_name = models.TextField(primary_key=True)
     likes = models.ManyToManyField(Post)
-    timestamp = models.DateTimeField() # Use to determine last track time
+    timestamp = models.TextField() # Use to determine last track time
     
     def __unicode__(self):
         return self.host_name
+    

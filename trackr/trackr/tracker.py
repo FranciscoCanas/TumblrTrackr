@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+from django.utils.html import strip_tags
 from django.core.exceptions import ObjectDoesNotExist
 import datetime
 import project_vars as pv
@@ -123,12 +124,36 @@ def retrieve_post_details(post_id):
 def _parse_post_json(blog_host_name, liked_post_json):
     ''' Takes the json from a post and extracts all its juicy goodness, then
         makes a database entry for it, if necessary.'''
-    # TODO: Check if post is already in db, and check if it's already 
+    # TODO: Check if post is already in db, and check if it's alrea
+    dy 
     # marked as 'liked' by the given blog. Modify db as necessary. 
     # Update post timestamp.
     # Example: liked_post_json['post_url'] to get the url
-
+    blog_obj = Blog.objects.get(host_name = blog_host_name)
+    if liked_post_json['type'] == "text":    
+        post_obj = Post(url = liked_post_json['post_url'], 
+                        date = liked_post_json['date'],
+                        last_track = '{:%Y-%m-%d %H:%M:%S} EST'.format(datetime.datetime.now()),
+                        note_count = liked_post_json['note_count'],
+                        note_inc = 0,
+                        text = liked_post_json['title'],
+                        tracking = [])
+    elif liked_post_json['type'] == "photo":
+        post_obj = Post(url = liked_post_json['post_url'], 
+                        date = liked_post_json['date'],
+                        last_track = '{:%Y-%m-%d %H:%M:%S} EST'.format(datetime.datetime.now()),
+                        image = liked_post_json['photos'][0]['alt_sizes'][0]['url'],
+                        note_count = liked_post_json['note_count'],
+                        note_inc = 0,
+                        text = strip_tags(liked_post_json['caption'].encode('utf-8')),
+                        tracking = [])
+    post_obj.save()
+    blog_obj.likes.add(post_obj)         
     return 0
+
+
+def _parse_text(liked_post_json):
+    
 
 def _post_request_str(blog_host_name, post_id):
     ''' Returns a string with the request for gettin' a post.
