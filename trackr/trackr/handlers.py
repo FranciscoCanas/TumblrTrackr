@@ -19,7 +19,6 @@ def get_blog_trends(request, blog_name):
 	json = {"trending" : [], 
 	        "order": order, 
 	        "limit": limit}
-
 	if order == "Trending":
 		try:
 			blog_obj = Blog.objects.get(host_name=blog_name)
@@ -39,7 +38,7 @@ def get_blog_trends(request, blog_name):
 '''Send trends from all blogs that the user is subsribed to'''
 def get_trends(request):
 	''' Send trending data for all blogs.'''
-	limit = request.GET.get('limit', 7)
+	limit = request.GET.get('limit', 10)
 	order = request.GET['order']
 	if order == 'Trending':
 		stuff = "Trending"

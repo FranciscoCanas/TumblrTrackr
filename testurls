@@ -1,5 +1,7 @@
-/blog?blog=myblog
-/blog/myblog/trends?limit=5&order=true
+/blog?blog=artgalleryofontario.tumblr.com
+/blog/myblog/trends?limit=5&order=Trending
+/blog/myblog/trends?limit=5&order=Recent
 /blogs/trends?limit=3
+/blogs/trends
 /track?blog=artgalleryofontario.tumblr.com
 /track

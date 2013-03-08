@@ -17,6 +17,7 @@ def track(request):
         # Used for tracking a single blog_name for testing
         # TODO: Check that the blog hasn't been tracked in the last hour
         # first
+        
         response = [_request_likes(blog_name)]
     else:
         # Used for starting the massive blog tracking batch job
@@ -51,6 +52,7 @@ def _request_likes(blog_host_name):
     ''' Helper for retreiving likes from tumblr. 
         Given a base blog, makes the request.'''
 
+    # tumblr API request right here:
     response = requests.get(_likes_request_str(blog_host_name))
     json=response.json()    
     ret = json['meta']['status']
@@ -118,11 +120,14 @@ def retrieve_post_details(post_id):
     # to do the rest.
     return 0
 
-def _parse_post_json(blog_host_name, liked_post):
+def _parse_post_json(blog_host_name, liked_post_json):
     ''' Takes the json from a post and extracts all its juicy goodness, then
         makes a database entry for it, if necessary.'''
     # TODO: Check if post is already in db, and check if it's already 
-    # marked as 'liked' by the given blog. Modify db as necessary.
+    # marked as 'liked' by the given blog. Modify db as necessary. 
+    # Update post timestamp.
+    # Example: liked_post_json['post_url'] to get the url
+
     return 0
 
 def _post_request_str(blog_host_name, post_id):

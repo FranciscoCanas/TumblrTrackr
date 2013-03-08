@@ -34,8 +34,23 @@ Done.
 4) Once the file has extracted, type: cd kennethreitz-requests-13de692/
 5) Install it with: python setup.py install --user
 
-Now go to some arbitrary folder, start python's interpreter, and try to 'import requests' to make sure it works... should be set. 
+Now go to some arbitrary folder, start python's interpreter, and try to 'import requests' to make sure it works... should be set.
 
+########## How to use REQUESTS from the command line:
+Open up python interpreter.
+import requests
+r=requests.get('http://api.tumblr.com/v2/blog/artgalleryofontario.tumblr.com/likes?api_key=
+        UVsuuWUK99CX70DXIKylXXoCVo1QPvYzYPxKzN0GLTVxyd26bx')
+j=r.json()
+j['meta'] # The meta response info
+j['response'] # The actual response
+j['response']['liked_posts'] # the list of liked posts
+j['response']['liked_posts'][0] # The first post json object
+j['response']['liked_posts'][0]['post_url'] # The first post's json's post url 
+
+# This one gets a specific post from artgalleryofontario.tumblr.com w/ id 23:
+r=requests.get('http://api.tumblr.com/v2/blog/artgalleryofontario.tumblr.com/posts?api_key=
+        UVsuuWUK99CX70DXIKylXXoCVo1QPvYzYPxKzN0GLTVxyd26bx&id=23')
 
 
 
