@@ -8,7 +8,7 @@ from models import *
 def add_blog(request):
 	blog_name = request.REQUEST['blog'] # Using .REQUEST instead of .POST for testing
 	if (Blog.objects.filter(host_name = blog_name).exists() != True):
-		b = Blog(host_name = blog_name)
+		b = Blog(host_name = blog_name, timestamp = datetime.datetime.now())
 		b.save()
 	return HttpResponse(blog_name)
 
