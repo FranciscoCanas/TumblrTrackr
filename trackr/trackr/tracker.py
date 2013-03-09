@@ -132,7 +132,7 @@ def _parse_post_json(blog_host_name, liked_post_json):
     post_url = liked_post_json['post_url']
     post_date = liked_post_json['date']
     post_count = liked_post_json['note_count']
-    current_datetime = '{:%Y-%m-%d %H:%M:%S} EST'.format(datetime.datetime.now())
+    current_datetime = datetime.datetime.now()
     
     if (Post.objects.filter(url = post_url).exists() != True):
         if liked_post_json['type'] == "text" or liked_post_json['type'] == "chat":    
@@ -192,7 +192,12 @@ def _parse_post_json(blog_host_name, liked_post_json):
         post_obj.save()
         blog_obj.likes.add(post_obj)     
     else:
-        pass
+        # update note_count and last_track.
+        post_obj = Post.objects.get(url=post_url)
+        post_obj.note_count = post_count
+        post_obj.last_track = current_datetime
+        post_obj.save()
+        
     return 0
     
 
