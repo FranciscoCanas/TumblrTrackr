@@ -1,3 +1,3 @@
 #!/bin/sh
 
-python manage.py runserver 30945
+python ~/CSC309/csc309-a2/trackr/manage.py runserver 30945
