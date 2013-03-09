@@ -14,7 +14,7 @@ class Tracking(models.Model):
 class Post(models.Model):
     url = models.TextField()
     date = models.TextField() # 
-    last_track = models.extField()
+    last_track = models.TextField()
     image = models.TextField() # This is a url to the img
     note_count = models.IntegerField()
     note_inc = models.IntegerField()
