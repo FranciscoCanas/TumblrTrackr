@@ -5,7 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from trackr.models import *
 from models import *
 
-''' Add a new blog to our tracking list.'''	
+''' Add a new blog to our tracking list.''' 
 def add_blog(request):
 	blog_name = request.REQUEST['blog'] # Using .REQUEST instead of .POST for testing
 	if (Blog.objects.filter(host_name = blog_name).exists() != True):
@@ -56,14 +56,13 @@ def get_trends(request):
 	limit = request.GET.get('limit', 10)
 	order = request.GET['order']
 	if order == 'Trending':
-		stuff = "Trending"
+	    stuff = "Trending"
 	elif order == "Recent":
-		stuff = "Recent"
+	    stuff = "Recent"
 	else:
-		return HttpResponse(200)
-	# Fill this here in. With code.
+	    return HttpResponse(200)
 	return HttpResponse(stuff)
-	
+    
 def ping(request):
     return HttpResponse(200);
 
