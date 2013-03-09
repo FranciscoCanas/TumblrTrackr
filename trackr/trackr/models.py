@@ -3,12 +3,6 @@
 
 from django.db import models
 from django.http import HttpResponse
-#Table that contains tracking infomation on all the psots
-class Tracking(models.Model):
-    timestamp = models.DateTimeField()
-    sequence = models.IntegerField()
-    increment = models.IntegerField()
-    count = models.IntegerField()
 
 #Table that contains all the posts being tracked
 class Post(models.Model):
@@ -19,10 +13,18 @@ class Post(models.Model):
     note_count = models.IntegerField()
     note_inc = models.IntegerField()
     text = models.TextField()
-    tracking = models.OneToOneField(Tracking)
     
     def __unicode__(self):
         return self.url
+
+#Table that contains tracking infomation on all the psots
+class Tracking(models.Model):
+    post = models.ForeignKey(Post)
+    timestamp = models.DateTimeField()
+    sequence = models.IntegerField()
+    increment = models.IntegerField()
+    count = models.IntegerField()
+
 
 #Table of all the blogs being tracked
 class Blog(models.Model):

@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from django.db.models import Max
+import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from trackr.models import *
 from models import *
@@ -8,7 +9,7 @@ from models import *
 def add_blog(request):
 	blog_name = request.REQUEST['blog'] # Using .REQUEST instead of .POST for testing
 	if (Blog.objects.filter(host_name = blog_name).exists() != True):
-		b = Blog(host_name = blog_name, timestamp = datetime.datetime.now())
+		b = Blog(host_name = blog_name, timestamp = datetime.datetime.utcnow())
 		b.save()
 	return HttpResponse(blog_name)
 

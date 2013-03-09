@@ -1,10 +1,11 @@
 from django.http import HttpResponse
 from django.utils.html import strip_tags
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils.timezone import utc
 import datetime
 import project_vars as pv
 import requests
-from models import Blog, Post
+from models import Blog, Post, Tracking
 
 #################################
 # Retrieving the likes for posts:
@@ -132,9 +133,9 @@ def _parse_post_json(blog_host_name, liked_post_json):
     post_url = liked_post_json['post_url']
     post_date = liked_post_json['date']
     post_count = liked_post_json['note_count']
-    current_datetime = datetime.datetime.utcnow()
-    
+    current_datetime = datetime.datetime.utcnow().replace(tzinfo=utc)
     if (Post.objects.filter(url = post_url).exists() != True):
+        print("asdfs")
         if liked_post_json['type'] == "text" or liked_post_json['type'] == "chat":    
             post_obj = Post(url = post_url, 
                             date = post_date,
@@ -142,8 +143,7 @@ def _parse_post_json(blog_host_name, liked_post_json):
                             image = "http://www.athgo.org/ablog/wp-content/uploads/2013/02/tumblr_logo.png",
                             note_count = post_count,
                             note_inc = 0,
-                            text = strip_tags(liked_post_json['body'].encode('utf-8'))[:100] + "...",
-                            tracking = [])
+                            text = strip_tags(liked_post_json['body'].encode('utf-8'))[:100] + "...")
         elif liked_post_json['type'] == "photo":
             post_obj = Post(url = post_url, 
                             date = post_date,
@@ -151,8 +151,7 @@ def _parse_post_json(blog_host_name, liked_post_json):
                             image = liked_post_json['photos'][0]['alt_sizes'][0]['url'],
                             note_count = post_count,
                             note_inc = 0,
-                            text = strip_tags(liked_post_json['caption'].encode('utf-8')),
-                            tracking = [])
+                            text = strip_tags(liked_post_json['caption'].encode('utf-8')))
         elif liked_post_json['type'] == "audio" or liked_post_json['type'] == "video":
             post_obj = Post(url = post_url, 
                             date = post_date,
@@ -160,8 +159,7 @@ def _parse_post_json(blog_host_name, liked_post_json):
                             image = "http://www.ncomm.ca/wp-content/uploads/2011/06/Audio-Video-tab-pic.jpg",
                             note_count = post_count,
                             note_inc = 0,
-                            text = strip_tags(liked_post_json['caption'].encode('utf-8'))[:100] + "...",
-                            tracking = [])
+                            text = strip_tags(liked_post_json['caption'].encode('utf-8'))[:100] + "...")
         elif liked_post_json['type'] == "link":
             post_obj = Post(url = post_url, 
                             date = post_date,
@@ -169,8 +167,7 @@ def _parse_post_json(blog_host_name, liked_post_json):
                             image = "http://www.athgo.org/ablog/wp-content/uploads/2013/02/tumblr_logo.png",
                             note_count = post_count,
                             note_inc = 0,
-                            text = strip_tags(liked_post_json['description'].encode('utf-8'))[:100] + "...",
-                            tracking = [])
+                            text = strip_tags(liked_post_json['description'].encode('utf-8'))[:100] + "...")
         elif liked_post_json['type'] == "quote":
             post_obj = Post(url = post_url, 
                             date = post_date,
@@ -178,8 +175,7 @@ def _parse_post_json(blog_host_name, liked_post_json):
                             image = "http://www.athgo.org/ablog/wp-content/uploads/2013/02/tumblr_logo.png",
                             note_count = post_count,
                             note_inc = 0,
-                            text = strip_tags(liked_post_json['source'].encode('utf-8'))[:100] + "...",
-                            tracking = [])
+                            text = strip_tags(liked_post_json['source'].encode('utf-8'))[:100] + "...")
         elif liked_post_json['type'] == "answer":
             post_obj = Post(url = post_url, 
                             date = post_date,
@@ -187,11 +183,13 @@ def _parse_post_json(blog_host_name, liked_post_json):
                             image = "http://www.athgo.org/ablog/wp-content/uploads/2013/02/tumblr_logo.png",
                             note_count = post_count,
                             note_inc = 0,
-                            text = strip_tags(liked_post_json['answer'].encode('utf-8'))[:100] + "...",
-                            tracking = [])
+                            text = strip_tags(liked_post_json['answer'].encode('utf-8'))[:100] + "...")
         post_obj.save()
-        blog_obj.likes.add(post_obj)     
+        tracking = Tracking(post=post_obj, timestamp=current_datetime, sequence=0, increment=0, count=0)
+        tracking.save()
+        blog_obj.likes.add(post_obj)   
     else:
+        print("exists")
         # update note_count and last_track.
         post_obj = Post.objects.get(url=post_url)
         post_obj.note_count = post_count
