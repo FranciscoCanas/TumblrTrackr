@@ -1,0 +1,1 @@
+15 * * * * python ~/CSC309/csc309-a2/automate_tracking.py
