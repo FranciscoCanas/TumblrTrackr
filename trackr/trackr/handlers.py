@@ -6,7 +6,7 @@ from models import *
 
 ''' Add a new blog to our tracking list.'''	
 def add_blog(request):
-	if (Blog.objects.filter(host_name = blog_name).exists() != True):
+	if (!Blog.objects.filter(host_name = blog_name).exists()):
 		blog_name = request.REQUEST['blog'] # Using .REQUEST instead of .POST for testing
 		b = Blog(host_name = blog_name)
 		b.save()
@@ -50,5 +50,8 @@ def get_trends(request):
 		return HttpResponse(200)
 	# Fill this here in. With code.
 	return HttpResponse(stuff)
+	
+def ping(request):
+    return HttpResponse(200);
 
 
