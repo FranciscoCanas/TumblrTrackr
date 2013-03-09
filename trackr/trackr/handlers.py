@@ -1,14 +1,15 @@
 from django.http import HttpResponse
 from django.db.models import Max
+import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from trackr.models import *
 from models import *
 
-''' Add a new blog to our tracking list.'''	
+''' Add a new blog to our tracking list.''' 
 def add_blog(request):
 	blog_name = request.REQUEST['blog'] # Using .REQUEST instead of .POST for testing
 	if (Blog.objects.filter(host_name = blog_name).exists() != True):
-		b = Blog(host_name = blog_name)
+		b = Blog(host_name = blog_name, timestamp = datetime.datetime.utcnow())
 		b.save()
 	return HttpResponse(blog_name)
 
@@ -27,14 +28,26 @@ def get_blog_trends(request, blog_name):
 				trending = {"url": post.url,
 				            "image": post.image,
 				            "date": post.date,
-				            "last_track": post.last_track,
+				            "last_track": '{:%Y-%m-%d %H:%M:%S} EST'.format(post.last_track),
 				            "last_count": post.note_count,
 				            "tracking": []}
 				json["trending"].append(trending)
 		except ObjectDoesNotExist:
 			return HttpResponse(404)
 	elif order == "Recent":
-		pass
+		try:
+			blog_obj = Blog.objects.get(host_name = blog_name) #Gets a Blog object in database with blog_name as host_name
+			blog_likes = blog_obj.likes.order_by('-last_track')[0:limit] #QuerySet of liked posts with most recent tracking
+			for post in blog_likes:
+				trending = {"url": post.url,
+				            "image": post.image,
+				            "date": post.date,
+				            "last_track": '{:%Y-%m-%d %H:%M:%S} EST'.format(post.last_track),
+				            "last_count": post.note_count,
+				            "tracking": []}
+				json["trending"].append(trending)
+		except ObjectDoesNotExist:
+			return HttpResponse(404)
 	return HttpResponse(200)
 	
 '''Send trends from all blogs that the user is subsribed to'''
@@ -69,10 +82,11 @@ def get_trends(request):
 			return HttpResponse(404)
 		#while true check every hour
 		#stuff = blog_likes
-
 	else:
 		return HttpResponse(200)
-	# Fill this here in. With code.
 	return HttpResponse(stuff)
+    
+def ping(request):
+	return HttpResponse(200);
 
 
