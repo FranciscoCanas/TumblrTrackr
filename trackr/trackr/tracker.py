@@ -124,35 +124,76 @@ def retrieve_post_details(post_id):
 def _parse_post_json(blog_host_name, liked_post_json):
     ''' Takes the json from a post and extracts all its juicy goodness, then
         makes a database entry for it, if necessary.'''
-    # TODO: Check if post is already in db, and check if it's alrea
-    dy 
+    # TODO: Check if post is already in db, and check if it's already 
     # marked as 'liked' by the given blog. Modify db as necessary. 
     # Update post timestamp.
     # Example: liked_post_json['post_url'] to get the url
     blog_obj = Blog.objects.get(host_name = blog_host_name)
-    if liked_post_json['type'] == "text":    
-        post_obj = Post(url = liked_post_json['post_url'], 
-                        date = liked_post_json['date'],
-                        last_track = '{:%Y-%m-%d %H:%M:%S} EST'.format(datetime.datetime.now()),
-                        note_count = liked_post_json['note_count'],
-                        note_inc = 0,
-                        text = liked_post_json['title'],
-                        tracking = [])
-    elif liked_post_json['type'] == "photo":
-        post_obj = Post(url = liked_post_json['post_url'], 
-                        date = liked_post_json['date'],
-                        last_track = '{:%Y-%m-%d %H:%M:%S} EST'.format(datetime.datetime.now()),
-                        image = liked_post_json['photos'][0]['alt_sizes'][0]['url'],
-                        note_count = liked_post_json['note_count'],
-                        note_inc = 0,
-                        text = strip_tags(liked_post_json['caption'].encode('utf-8')),
-                        tracking = [])
-    post_obj.save()
-    blog_obj.likes.add(post_obj)         
+    post_url = liked_post_json['post_url']
+    post_date = liked_post_json['date']
+    post_count = liked_post_json['note_count']
+    current_datetime = '{:%Y-%m-%d %H:%M:%S} EST'.format(datetime.datetime.now())
+    
+    if (Post.objects.filter(url = post_url).exists() != True):
+        if liked_post_json['type'] == "text" or liked_post_json['type'] == "chat":    
+            post_obj = Post(url = post_url, 
+                            date = post_date,
+                            last_track = current_datetime,
+                            image = "http://www.athgo.org/ablog/wp-content/uploads/2013/02/tumblr_logo.png",
+                            note_count = post_count,
+                            note_inc = 0,
+                            text = strip_tags(liked_post_json['body'].encode('utf-8'))[:100] + "...",
+                            tracking = [])
+        elif liked_post_json['type'] == "photo":
+            post_obj = Post(url = post_url, 
+                            date = post_date,
+                            last_track = current_datetime,
+                            image = liked_post_json['photos'][0]['alt_sizes'][0]['url'],
+                            note_count = post_count,
+                            note_inc = 0,
+                            text = strip_tags(liked_post_json['caption'].encode('utf-8')),
+                            tracking = [])
+        elif liked_post_json['type'] == "audio" or liked_post_json['type'] == "video":
+            post_obj = Post(url = post_url, 
+                            date = post_date,
+                            last_track = current_datetime,
+                            image = "http://www.ncomm.ca/wp-content/uploads/2011/06/Audio-Video-tab-pic.jpg",
+                            note_count = post_count,
+                            note_inc = 0,
+                            text = strip_tags(liked_post_json['caption'].encode('utf-8'))[:100] + "...",
+                            tracking = [])
+        elif liked_post_json['type'] == "link":
+            post_obj = Post(url = post_url, 
+                            date = post_date,
+                            last_track = current_datetime,
+                            image = "http://www.athgo.org/ablog/wp-content/uploads/2013/02/tumblr_logo.png",
+                            note_count = post_count,
+                            note_inc = 0,
+                            text = strip_tags(liked_post_json['description'].encode('utf-8'))[:100] + "...",
+                            tracking = [])
+        elif liked_post_json['type'] == "quote":
+            post_obj = Post(url = post_url, 
+                            date = post_date,
+                            last_track = current_datetime,
+                            image = "http://www.athgo.org/ablog/wp-content/uploads/2013/02/tumblr_logo.png",
+                            note_count = post_count,
+                            note_inc = 0,
+                            text = strip_tags(liked_post_json['source'].encode('utf-8'))[:100] + "...",
+                            tracking = [])
+        elif liked_post_json['type'] == "answer":
+            post_obj = Post(url = post_url, 
+                            date = post_date,
+                            last_track = current_datetime,
+                            image = "http://www.athgo.org/ablog/wp-content/uploads/2013/02/tumblr_logo.png",
+                            note_count = post_count,
+                            note_inc = 0,
+                            text = strip_tags(liked_post_json['answer'].encode('utf-8'))[:100] + "...",
+                            tracking = [])
+        post_obj.save()
+        blog_obj.likes.add(post_obj)     
+    else:
+        pass
     return 0
-
-
-def _parse_text(liked_post_json):
     
 
 def _post_request_str(blog_host_name, post_id):
