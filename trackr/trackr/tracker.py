@@ -152,7 +152,7 @@ def _parse_post_json(blog_host_name, liked_post_json):
     return 0
 
 
-def _parse_text(liked_post_json):
+#def _parse_text(liked_post_json):
     
 
 def _post_request_str(blog_host_name, post_id):

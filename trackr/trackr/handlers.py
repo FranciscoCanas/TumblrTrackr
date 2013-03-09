@@ -6,8 +6,8 @@ from models import *
 
 ''' Add a new blog to our tracking list.'''	
 def add_blog(request):
+	blog_name = request.REQUEST['blog'] # Using .REQUEST instead of .POST for testing
 	if (Blog.objects.filter(host_name = blog_name).exists() != True):
-		blog_name = request.REQUEST['blog'] # Using .REQUEST instead of .POST for testing
 		b = Blog(host_name = blog_name)
 		b.save()
 	return HttpResponse(blog_name)
@@ -42,10 +42,34 @@ def get_trends(request):
 	''' Send trending data for all blogs.'''
 	limit = request.GET.get('limit', 10)
 	order = request.GET['order']
+	json = {"trending" : [], 
+	        "order": order, 
+	        "limit": limit} #Initializes a JSON object to track all posts liked by a blog
+	Blog.objects.filter(host_name = Blog.blog_name).exists() 
+	#return posts that have the largest increments in note_count in the last hour
 	if order == 'Trending':
 		stuff = "Trending"
+	#return the most top "limit"recent posts regardless of their popularity
 	elif order == "Recent":
-		stuff = "Recent"
+		try:
+			for i in limit:
+				#10 most recent blog objects
+				blog_obj = Blog.objects.get(host_name = blog_name) 
+				blog_follow = blog_obj.likes.order_by('-timestamp')[0:limit]
+				for post in blog_follow:
+					recent = {"url": post.url,
+						    "text":post.text,
+						    "image": post.image,
+						    "date": post.date,
+						    "last_track": post.last_track,
+						    "last_count": post.note_count,
+						    "tracking": []}
+					json["recent"].append(recent)
+		except ObjectDoesNotExist:
+			return HttpResponse(404)
+		#while true check every hour
+		#stuff = blog_likes
+
 	else:
 		return HttpResponse(200)
 	# Fill this here in. With code.
