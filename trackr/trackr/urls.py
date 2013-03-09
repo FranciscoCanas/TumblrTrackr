@@ -19,7 +19,7 @@ urlpatterns = patterns('',
 
 	# Used for manually starting a tracking go go machine sandwich
 	url(r'^track$', tracker.track), 
-    url(r'^testq$', testquery.testquery)
+    url(r'^testq$', testquery.testquery),
     url(r'^ping$', handlers.ping) 
 )
 
