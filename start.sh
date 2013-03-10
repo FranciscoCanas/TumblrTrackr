@@ -1,3 +1,3 @@
 #!/bin/sh
-
-python ./trackr/manage.py runserver 30945
+cd ./trackr
+python manage.py runserver 30945
