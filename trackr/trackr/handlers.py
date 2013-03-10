@@ -99,8 +99,9 @@ def get_trends(request):
 			return HttpResponse(404)
 	else:
 		return HttpResponse(200)
-	
-	return HttpResponse(stuff)
+
+	return HttpResponse(404)
+
     
 def ping(request):
 	return HttpResponse(200);

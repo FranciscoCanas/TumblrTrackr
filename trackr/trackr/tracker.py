@@ -195,7 +195,6 @@ def _parse_post_json(blog_host_name, liked_post_json):
         post_obj.note_count = post_count
         post_obj.last_track = current_datetime
         post_obj.save()
-        
     return 0
 
 
