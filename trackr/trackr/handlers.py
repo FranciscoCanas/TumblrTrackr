@@ -59,31 +59,47 @@ def get_trends(request):
 	        "order": order, 
 	        "limit": limit} #Initializes a JSON object to track all posts liked by a blog
 	Blog.objects.filter(host_name = Blog.blog_name).exists() 
+	
 	#return posts that have the largest increments in note_count in the last hour
 	if order == 'Trending':
-		stuff = "Trending"
+		try:
+			#10 most recent blog objects
+			blog_obj = Blog.objects.get(host_name = blog_name) #not sure if it returns all blogs or just one
+			blog_follow = blog_obj.order_by('-note_inc')[0:limit]
+			for post in blog_follow:
+				trending = {"url": post.url,
+			                    "text":post.text,
+			                    "image": post.image,
+			                    "date": post.date,
+			                    "last_track":'{:%Y-%m-%d %H:%M:%S} EST'.format(post.last_track),
+			                    "last_count": post.note_count,
+			                    "tracking": []}
+				json["trending"].append(trending)
+		except ObjectDoesNotExist:
+			return HttpResponse(404)
+	else:
+		return HttpResponse(200)
+	
 	#return the most top "limit"recent posts regardless of their popularity
 	elif order == "Recent":
 		try:
-			for i in limit:
-				#10 most recent blog objects
-				blog_obj = Blog.objects.get(host_name = blog_name) 
-				blog_follow = blog_obj.likes.order_by('-timestamp')[0:limit]
-				for post in blog_follow:
-					recent = {"url": post.url,
-						    "text":post.text,
-						    "image": post.image,
-						    "date": post.date,
-						    "last_track": post.last_track,
-						    "last_count": post.note_count,
-						    "tracking": []}
-					json["recent"].append(recent)
+			#10 most recent blog objects
+			blog_obj = Blog.objects.get(host_name = blog_name) 
+			blog_follow = blog_obj.order_by('-timestamp')[0:limit]
+			for post in blog_follow:
+				recent = {"url": post.url,
+			                    "text":post.text,
+			                    "image": post.image,
+			                    "date": post.date,
+			                    "last_track":'{:%Y-%m-%d %H:%M:%S} EST'.format(post.last_track),
+			                    "last_count": post.note_count,
+			                    "tracking": []}
+				json["recent"].append(recent)
 		except ObjectDoesNotExist:
 			return HttpResponse(404)
-		#while true check every hour
-		#stuff = blog_likes
 	else:
 		return HttpResponse(200)
+	
 	return HttpResponse(stuff)
     
 def ping(request):
