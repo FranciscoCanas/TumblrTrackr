@@ -11,7 +11,7 @@ except ConnectionError:
     f.write(str(datetime.datetime.now()) + ':' + str(r) + '\n')
     f.close()
     # Above code duplicated because subprocess call never really comes back
-    subprocess.call(['/h/u15/g1/00/g1canasf/CSC309/csc309-a2/trackr/start.sh'])
+    subprocess.call(['/h/u15/g1/00/g1canasf/CSC309/csc309-a2/start.sh'])
         
     
 f.write(str(datetime.datetime.now()) + ':' + str(r) + '\n')
