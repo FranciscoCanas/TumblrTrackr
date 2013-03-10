@@ -84,7 +84,7 @@ def get_trends(request):
 		#stuff = blog_likes
 	else:
 		return HttpResponse(200)
-	return HttpResponse(stuff)
+	return HttpResponse(404)
     
 def ping(request):
 	return HttpResponse(200);

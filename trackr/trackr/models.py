@@ -5,14 +5,6 @@ from django.db import models
 from django.http import HttpResponse
 
 
-#Table that contains tracking infomation on all the posts
-class Tracking(models.Model):
-    timestamp = models.TextField()
-    sequence = models.IntegerField()
-    increment = models.IntegerField()
-    count = models.IntegerField()
-
-
 #Table that contains all the posts being tracked
 class Post(models.Model):
     url = models.TextField()
