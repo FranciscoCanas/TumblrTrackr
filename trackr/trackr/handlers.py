@@ -21,13 +21,15 @@ def get_blog_trends(request, blog_name):
 	        "order": order, 
 	        "limit": limit} #Initializes a JSON object to track all posts liked by a blog
 	if order == "Trending":
+		print('TRENDINGGG')
 		try:
 			blog_obj = Blog.objects.get(host_name = blog_name) #Gets a Blog object in database with blog_name as host_name
 			blog_likes = blog_obj.likes.order_by('-note_inc')[0:limit] #QuerySet of liked posts with most note_count
 			for post in blog_likes:
 				trending = {"url": post.url,
 				            "image": post.image,
-				            "date": post.date,
+				            "text": post.text,
+					    "date": post.date,
 				            "last_track": '{:%Y-%m-%d %H:%M:%S} EST'.format(post.last_track),
 				            "last_count": post.note_count,
 				            "tracking": []}
@@ -41,6 +43,7 @@ def get_blog_trends(request, blog_name):
 			for post in blog_likes:
 				trending = {"url": post.url,
 				            "image": post.image,
+					    "text": post.text,
 				            "date": post.date,
 				            "last_track": '{:%Y-%m-%d %H:%M:%S} EST'.format(post.last_track),
 				            "last_count": post.note_count,
@@ -48,7 +51,8 @@ def get_blog_trends(request, blog_name):
 				json["trending"].append(trending)
 		except ObjectDoesNotExist:
 			return HttpResponse(404)
-	return HttpResponse(200)
+	print(json)
+	return HttpResponse(json)
 	
 '''Send trends from all blogs that the user is subsribed to'''
 def get_trends(request):
@@ -67,8 +71,8 @@ def get_trends(request):
 		try:
 			for i in limit:
 				#10 most recent blog objects
-				blog_obj = Blog.objects.get(host_name = blog_name) 
-				blog_follow = blog_obj.likes.order_by('-timestamp')[0:limit]
+				blog_follow = Blog.objects.all().likes.order_by('-timestamp')[0:limit]
+				print(blog_follow)
 				for post in blog_follow:
 					recent = {"url": post.url,
 						    "text":post.text,
@@ -84,7 +88,7 @@ def get_trends(request):
 		#stuff = blog_likes
 	else:
 		return HttpResponse(200)
-	return HttpResponse(404)
+	return HttpResponse('fuck')
     
 def ping(request):
 	return HttpResponse(200);
