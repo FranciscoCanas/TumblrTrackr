@@ -77,8 +77,6 @@ def get_trends(request):
 				json["trending"].append(trending)
 		except ObjectDoesNotExist:
 			return HttpResponse(404)
-	else:
-		return HttpResponse(200)
 	
 	#return the most top "limit"recent posts regardless of their popularity
 	elif order == "Recent":
@@ -97,11 +95,7 @@ def get_trends(request):
 				json["recent"].append(recent)
 		except ObjectDoesNotExist:
 			return HttpResponse(404)
-	else:
-		return HttpResponse(200)
-
-	return HttpResponse(404)
-
+	return HttpResponse(200)
     
 def ping(request):
 	return HttpResponse(200);
