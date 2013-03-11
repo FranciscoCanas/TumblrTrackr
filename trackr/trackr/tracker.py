@@ -117,6 +117,18 @@ def _parse_post_json(blog_host_name, liked_post_json):
     ''' Takes the json from a post and extracts all its juicy goodness, then
         makes a database entry for it, if necessary.'''
     
+    # Check the last time this post was tracked and ignore if 
+    # it's within the last hour.
+    post_id = liked_post_json['id']
+    new_post = not Post.objects.filter(post_id = post_id).exists()
+    
+    if (not new_post):
+        this_post = Post.objects.get(post_id = post_id)
+        deltatime = datetime.datetime.now().replace(tzinfo=None) - \
+            this_post.last_track.replace(tzinfo=None)            
+        if (deltatime.total_seconds()<3600):
+            return 0 
+        
     blog_obj = Blog.objects.get(host_name = blog_host_name)
     
     # Example: liked_post_json['post_url'] to get the url
@@ -149,12 +161,14 @@ def _parse_post_json(blog_host_name, liked_post_json):
     updated_times_tracked = 1
     img = img_field[liked_post_json['type']]()
     txt = strip_tags(liked_post_json[text_field[liked_post_json['type']]].encode('utf-8'))
+    
     # Reduce text length if too long.
     if len(txt) > 100:
         txt = txt[:100] + "..."
     
-    if (not Post.objects.filter(url = post_url).exists()):
-        post_obj = Post(url = post_url,
+    if (new_post):
+        post_obj = Post(post_id = post_id,
+                        url = post_url,
                         date = post_date,
                         last_track = current_datetime,
                         image = img,
@@ -168,10 +182,10 @@ def _parse_post_json(blog_host_name, liked_post_json):
     
     else:
         # update note_count and last_track.
-        post_obj = Post.objects.get(url=post_url)
+        post_obj = Post.objects.get(post_id=post_id)
         prev_count = post_obj.note_count
         updated_times_tracked = post_obj.times_tracked + 1
-        Post.objects.filter(url=post_url).update(times_tracked = updated_times_tracked, 
+        Post.objects.filter(post_id=post_id).update(times_tracked = updated_times_tracked, 
                                                  note_inc = post_count - prev_count,
                                                  note_count = post_count,
                                                  last_track = current_datetime)

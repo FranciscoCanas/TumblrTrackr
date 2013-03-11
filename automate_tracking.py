@@ -2,9 +2,18 @@ import requests
 import datetime
 from requests.exceptions import ConnectionError
 
-f=open('/h/u15/g1/00/g1canasf/CSC309/csc309-a2/tracking_log', 'a')
+f=open('/h/u15/g1/00/g1canasf/CSC309/a2/csc309-a2/tracking_log', 'a')
 try:
-    r=requests.get('http://127.0.0.1:30945/track')
+    r=requests.get('redwolf.cdf.toronto.edu:30945/ping')
+except ConnectionError:
+    r='Connection Error'
+    f.write(str(datetime.datetime.now()) + ':' + str(r) + '\n')
+    f.close()
+    # Above code duplicated because subprocess call never really comes back
+    subprocess.call(['/h/u15/g1/00/g1canasf/CSC309/a2/csc309-a2/start.sh'])
+
+try:
+    r=requests.get('redwolf.cdf.toronto.edu:30945/track?key=superdupersecrettrackingkey')
 except ConnectionError:
     r='Connection Error'
     

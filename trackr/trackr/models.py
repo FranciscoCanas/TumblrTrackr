@@ -7,6 +7,7 @@ from django.http import HttpResponse
 
 #Table that contains all the posts being tracked
 class Post(models.Model):
+    post_id = models.IntegerField(primary_key=True)
     url = models.TextField()
     date = models.DateTimeField()
     last_track = models.DateTimeField()

@@ -72,7 +72,7 @@ def get_timestamps(post):
     '''Return a list of timestamp dicts.'''
     
     lst = []
-    for t in Tracking.objects.filter(post = post.id):
+    for t in Tracking.objects.filter(post = post.post_id):
         tdict = {"timestamp" : '{:%Y-%m-%d %H:%M:%S %Z}'.format(t.timestamp),
                  "sequence" : t.sequence,
                  "increment" : post.note_inc,
