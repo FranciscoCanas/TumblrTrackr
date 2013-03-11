@@ -169,7 +169,6 @@ def _parse_post_json(blog_host_name, liked_post_json):
                                                  note_inc = post_count - prev_count,
                                                  note_count = post_count,
                                                  last_track = current_datetime)  
-    print(updated_times_tracked)
     tracking = Tracking(post = post_obj,
                         timestamp = current_datetime,
                         sequence = updated_times_tracked,

@@ -30,23 +30,23 @@ def get_blog_trends(request, blog_name):
 			trending = {"url": post.url,
 			            "image": post.image,
 			            "text": post.text,
-			            "date": post.date,
+			            "date": '{:%Y-%m-%d %H:%M:%S %Z}'.format(post.date),
 			            "last_track": '{:%Y-%m-%d %H:%M:%S} EST'.format(post.last_track),
 			            "last_count": post.note_count,
 			            "tracking": get_timestamps(post)}
-			json["trending"].append(trending)
+			result["trending"].append(trending)
 	elif order == "Recent":
 		blog_likes = blog_obj.likes.order_by('-last_track')[0:limit] #QuerySet of liked posts with most recent tracking
 		for post in blog_likes:
 			trending = {"url": post.url,
 			            "image": post.image,
 			            "text": post.text,
-			            "date": post.date,
+			            "date": '{:%Y-%m-%d %H:%M:%S %Z}'.format(post.date),
 			            "last_track": '{:%Y-%m-%d %H:%M:%S} EST'.format(post.last_track),
 			            "last_count": post.note_count,
 			            "tracking": get_timestamps(post)}
 			result["trending"].append(trending)
-	return HttpResponse(content=json.dump(result), status=200)
+	return HttpResponse(content=json.dumps(result), status=200)
 
 def get_timestamps(post):
 	'''Return a list of timestamp dictionaries.'''
