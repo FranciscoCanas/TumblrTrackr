@@ -75,6 +75,7 @@ def get_timestamps(post):
 		lst.append(tdict)
 		
 	# Return timestamps sorted by descending sequence number
+	print lst
 	return sorted(lst, key=lambda k: k['sequence'], reverse=True) 
 	
 def ping(request):

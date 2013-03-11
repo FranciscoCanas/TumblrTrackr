@@ -27,7 +27,7 @@ def track(request):
     return HttpResponse(_response_list_to_str(response))
 
 def retrieve_all_likes():
-    ''' Retrieve a list of liked posts:
+    '''Retrieve a list of liked posts:
 
     Method: GET api.tumblr.com/v2/blog/{base-hostname}/likes?api_key={key}
     Parameters:
@@ -49,7 +49,6 @@ def retrieve_all_likes():
 
 def request_likes(blog_host_name):
     ''' Retrieve likes from tumblr for the given blog.'''
-
     # tumblr API request right here:
     response = requests.get(_likes_request_str(blog_host_name))
     json = response.json()    
@@ -94,9 +93,11 @@ def _likes_request_str(blog_host_name):
     return  pv.tumblr_url + 'blog/' + blog_host_name + \
             '/likes?api_key=' + pv.api_key 
 
-#################################
-# Some helpers for output stuffs
-#################################       
+
+####################################
+## Some helpers for output stuffs ##
+####################################      
+
 def _response_to_str(response):
     ''' Takes a response tuple and formats it for english.'''
     return str(response[0]) + ' request got: ' + str(response[1]) + '\n'
@@ -107,15 +108,14 @@ def _response_list_to_str(response_list):
     
                     
         
-################################
-# Retrieving details for posts
-################################
+#################################
+## Retrieving details for posts #
+#################################
+
 def _parse_post_json(blog_host_name, liked_post_json):
     ''' Takes the json from a post and extracts all its juicy goodness, then
         makes a database entry for it, if necessary.'''
-    # TODO: Check if post is already in db, and check if it's already 
-    # marked as 'liked' by the given blog. Modify db as necessary. 
-    # Update post timestamp.
+    
     # Example: liked_post_json['post_url'] to get the url
     blog_obj = Blog.objects.get(host_name = blog_host_name)
     post_url = liked_post_json['post_url']
@@ -123,29 +123,25 @@ def _parse_post_json(blog_host_name, liked_post_json):
     post_count = liked_post_json['note_count']
     current_datetime = datetime.datetime.now().replace(tzinfo=utc)
  
+    # Different posts have different types of text fields.
+    text_field = {"text": "body",
+                  "chat": "body",
+                  "photo": "caption",
+                  "link": "description",
+                  "quote": "source",
+                  "answer": "answer",
+                  "audio": "caption",
+                  "video": "caption"}
+    
+    updated_times_tracked = 1
     if (not Post.objects.filter(url = post_url).exists()):
         # Set default image.
         img = "http://www.athgo.org/ablog/wp-content/uploads/2013/02/tumblr_logo.png"
-        
-        if liked_post_json['type'] == "text" or liked_post_json['type'] == "chat":    
-            txt = strip_tags(liked_post_json['body'].encode('utf-8'))[:150] + "..."
-        
-        elif liked_post_json['type'] == "photo":
-            img = liked_post_json['photos'][0]['alt_sizes'][0]['url']
-            txt = strip_tags(liked_post_json['caption'].encode('utf-8'))[:150] + "..."
-            
-        elif liked_post_json['type'] == "link":
-            txt = strip_tags(liked_post_json['description'].encode('utf-8'))[:150] + "..."
-            
-        elif liked_post_json['type'] == "quote":
-            txt = strip_tags(liked_post_json['source'].encode('utf-8'))[:150] + "..."
-        
-        elif liked_post_json['type'] == "answer":
-            txt = trip_tags(liked_post_json['answer'].encode('utf-8'))[:150] + "..."
-	    
-	elif liked_post_json['type'] == "audio" or liked_post_json['type'] == "video":
-            txt = trip_tags(liked_post_json['caption'].encode('utf-8'))[:150] + "..."
-            
+        txt = strip_tags(liked_post_json[text_field[liked_post_json['type']]].encode('utf-8'))
+	# Reduce text length if too long.
+	if len(txt) > 100:
+	    txt = txt[:100] + "..."
+
         post_obj = Post(url = post_url,
                         date = post_date,
                         last_track = current_datetime,
@@ -156,9 +152,8 @@ def _parse_post_json(blog_host_name, liked_post_json):
         
         post_obj.save()
         blog_obj.likes.add(post_obj)  
-	updated_times_tracked = post_obj.times_tracked + 1
-	post_obj.times_tracked = updated_times_tracked
-	post_obj.save()
+	blog_obj.save()
+	
     else:
         # update note_count and last_track.
         post_obj = Post.objects.get(url=post_url)
@@ -167,11 +162,15 @@ def _parse_post_json(blog_host_name, liked_post_json):
         Post.objects.filter(url=post_url).update(times_tracked = updated_times_tracked, 
                                                  note_inc = post_count - prev_count,
                                                  note_count = post_count,
-                                                 last_track = current_datetime)  
+                                                 last_track = current_datetime)
+	post_obj.save()
+	
+    # Create new tracking object for post.
     tracking = Tracking(post = post_obj,
                         timestamp = current_datetime,
                         sequence = updated_times_tracked)
-    tracking.save()       
+    tracking.save()
+    
     return 0
 
 def _post_request_str(blog_host_name, post_id):
