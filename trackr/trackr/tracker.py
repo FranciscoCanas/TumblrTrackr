@@ -14,17 +14,16 @@ from models import Blog, Post, Tracking
 #### Process starts here ####
 def track(request):
     ''' Used to manually start the tracking process for testing'''
-    blog_name = request.REQUEST.get('blog', '')
-    if blog_name:
-        # Used for tracking a single blog_name for testing
-        # TODO: Check that the blog hasn't been tracked in the last hour
-        # first
-        
-        response = [_request_likes(blog_name)]
-    else:
-        # Used for starting the massive blog tracking batch job
-        response = retrieve_all_likes()
-
+    # This is to ensure that the client doesn't try to track a blog
+    # more often than one hour. This might happen if the client discovers
+    # the tracker url.
+    #delta = datetime.datetime.now().replace(tzinfo=None) - Last_track.timestamp
+    #if (delta.total_seconds()/3600) < 1:
+        #return HttpResponse(status=404)
+    #else:
+        #GLOBAL_LAST_TRACK = datetime.datetime.now()
+        ## Used for starting the massive blog tracking batch job
+    response = retrieve_all_likes()
     return HttpResponse(_response_list_to_str(response))
 
 
@@ -114,14 +113,6 @@ def _response_list_to_str(response_list):
 ################################
 # Retrieving details for posts
 ################################
-def retrieve_post_details(post_id):
-    ''' Retrieve details for some post.'''
-    # TODO: pull post url from the database based on its id
-    # then make the request to tumblr.com to get the post
-    # object in json format. Then call _parse_post_json()
-    # to do the rest.
-    return 0
-
 def _parse_post_json(blog_host_name, liked_post_json):
     ''' Takes the json from a post and extracts all its juicy goodness, then
         makes a database entry for it, if necessary.'''
@@ -131,75 +122,61 @@ def _parse_post_json(blog_host_name, liked_post_json):
     # Example: liked_post_json['post_url'] to get the url
     blog_obj = Blog.objects.get(host_name = blog_host_name)
     post_url = liked_post_json['post_url']
-    post_date = liked_post_json['date']
+    post_date = convert_date(liked_post_json['date'])
     post_count = liked_post_json['note_count']
-    current_datetime = datetime.datetime.utcnow().replace(tzinfo=utc)
-    if (Post.objects.filter(url = post_url).exists() != True):
-        print("asdfs")
+    current_datetime = datetime.datetime.now().replace(tzinfo=utc)
+ 
+    if (not Post.objects.filter(url = post_url).exists()):
+        # Set default image.
+        img = "http://www.athgo.org/ablog/wp-content/uploads/2013/02/tumblr_logo.png"
+        
         if liked_post_json['type'] == "text" or liked_post_json['type'] == "chat":    
-            post_obj = Post(url = post_url, 
-                            date = post_date,
-                            last_track = current_datetime,
-                            image = "http://www.athgo.org/ablog/wp-content/uploads/2013/02/tumblr_logo.png",
-                            note_count = post_count,
-                            note_inc = 0,
-                            text = strip_tags(liked_post_json['body'].encode('utf-8'))[:100] + "...")
+            img = "http://www.athgo.org/ablog/wp-content/uploads/2013/02/tumblr_logo.png"
+            txt = strip_tags(liked_post_json['body'].encode('utf-8'))[:100] + "..."
+        
         elif liked_post_json['type'] == "photo":
-            post_obj = Post(url = post_url, 
-                            date = post_date,
-                            last_track = current_datetime,
-                            image = liked_post_json['photos'][0]['alt_sizes'][0]['url'],
-                            note_count = post_count,
-                            note_inc = 0,
-                            text = strip_tags(liked_post_json['caption'].encode('utf-8')))
-        elif liked_post_json['type'] == "audio" or liked_post_json['type'] == "video":
-            post_obj = Post(url = post_url, 
-                            date = post_date,
-                            last_track = current_datetime,
-                            image = "http://www.ncomm.ca/wp-content/uploads/2011/06/Audio-Video-tab-pic.jpg",
-                            note_count = post_count,
-                            note_inc = 0,
-                            text = strip_tags(liked_post_json['caption'].encode('utf-8'))[:100] + "...")
+            img = liked_post_json['photos'][0]['alt_sizes'][0]['url'],
+            txt = strip_tags(liked_post_json['caption'].encode('utf-8'))[:100] + "..."
+            
         elif liked_post_json['type'] == "link":
-            post_obj = Post(url = post_url, 
-                            date = post_date,
-                            last_track = current_datetime,
-                            image = "http://www.athgo.org/ablog/wp-content/uploads/2013/02/tumblr_logo.png",
-                            note_count = post_count,
-                            note_inc = 0,
-                            text = strip_tags(liked_post_json['description'].encode('utf-8'))[:100] + "...")
+            txt = strip_tags(liked_post_json['description'].encode('utf-8'))[:100] + "..."
+            
         elif liked_post_json['type'] == "quote":
-            post_obj = Post(url = post_url, 
-                            date = post_date,
-                            last_track = current_datetime,
-                            image = "http://www.athgo.org/ablog/wp-content/uploads/2013/02/tumblr_logo.png",
-                            note_count = post_count,
-                            note_inc = 0,
-                            text = strip_tags(liked_post_json['source'].encode('utf-8'))[:100] + "...")
+            txt = strip_tags(liked_post_json['source'].encode('utf-8'))[:100] + "..."
+        
         elif liked_post_json['type'] == "answer":
-            post_obj = Post(url = post_url, 
-                            date = post_date,
-                            last_track = current_datetime,
-                            image = "http://www.athgo.org/ablog/wp-content/uploads/2013/02/tumblr_logo.png",
-                            note_count = post_count,
-                            note_inc = 0,
-                            text = strip_tags(liked_post_json['answer'].encode('utf-8'))[:100] + "...")
+            txt = trip_tags(liked_post_json['answer'].encode('utf-8'))[:100] + "..."
+            
+        post_obj = Post(url = post_url,
+                        date = post_date,
+                        last_track = current_datetime,
+                        image = img,
+                        note_count = post_count,
+                        note_inc = 0,
+                        text = txt)
+        
         post_obj.save()
-        tracking = Tracking(post=post_obj, timestamp=current_datetime, sequence=0, increment=0, count=0)
-        tracking.save()
-        blog_obj.likes.add(post_obj)   
+        blog_obj.likes.add(post_obj)  
+	updated_times_tracked = post_obj.times_tracked + 1
+	post_obj.times_tracked = updated_times_tracked
+	post_obj.save()
     else:
-        print("exists")
         # update note_count and last_track.
         post_obj = Post.objects.get(url=post_url)
-        post_obj.note_count = post_count
-        post_obj.last_track = current_datetime
-        post_obj.save()
+        prev_count = post_obj.note_count
+        updated_times_tracked = post_obj.times_tracked + 1
+        Post.objects.filter(url=post_url).update(times_tracked = updated_times_tracked, 
+                                                 note_inc = post_count - prev_count,
+                                                 note_count = post_count,
+                                                 last_track = current_datetime)  
+    print(updated_times_tracked)
+    tracking = Tracking(post = post_obj,
+                        timestamp = current_datetime,
+                        sequence = updated_times_tracked,
+                        increment = post_obj.note_inc,
+                        count = post_count)
+    tracking.save()       
     return 0
-
-
-#def _parse_text(liked_post_json):
-
 
 def _post_request_str(blog_host_name, post_id):
     ''' Returns a string with the request for gettin' a post.
@@ -209,3 +186,9 @@ def _post_request_str(blog_host_name, post_id):
     return  pv.tumblr_url + 'blog/' + blog_host_name + \
             '/posts?api_key=' + pv.api_key + '&id=' + post_id
 
+def convert_date(date):
+	''' Convert a date in string form into a datetime object. '''
+	
+	# example date string: "2013-03-13 12:20:00 EST"
+	
+	return datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S %Z').replace(tzinfo=utc)

@@ -8,12 +8,13 @@ from django.http import HttpResponse
 #Table that contains all the posts being tracked
 class Post(models.Model):
     url = models.TextField()
-    date = models.TextField() # 
+    date = models.DateTimeField() # 
     last_track = models.DateTimeField()
     image = models.TextField() # This is a url to the img
     note_count = models.IntegerField()
     note_inc = models.IntegerField()
     text = models.TextField()
+    times_tracked = models.IntegerField(default=0, blank=True)
     
     def __unicode__(self):
         return self.url
@@ -31,8 +32,8 @@ class Tracking(models.Model):
 class Blog(models.Model):
     host_name = models.TextField(primary_key=True)
     likes = models.ManyToManyField(Post)
-    timestamp = models.DateTimeField() # Use to determine last track time
     
     def __unicode__(self):
         return self.host_name
+    
     
