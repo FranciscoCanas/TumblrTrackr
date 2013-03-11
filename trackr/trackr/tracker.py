@@ -7,11 +7,11 @@ import project_vars as pv
 import requests
 from models import Blog, Post, Tracking
 
-#################################
-# Retrieving the likes for posts:
-#################################
+####################################
+## Retrieving the likes for posts ##
+####################################
 
-#### Process starts here ####
+
 def track(request):
     ''' Used to manually start the tracking process for testing'''
     # This is to ensure that the client doesn't try to track a blog
@@ -26,8 +26,6 @@ def track(request):
     response = retrieve_all_likes()
     return HttpResponse(_response_list_to_str(response))
 
-
-# Send AJAX request to tumblr.com to get da likes
 def retrieve_all_likes():
     ''' Retrieve a list of liked posts:
 
@@ -44,22 +42,21 @@ def retrieve_all_likes():
     # For each blog in Blogs:
     for blog in Blog.objects.all():
         # Send AJAX request to tumblr.com to get da likes
-        response = _request_likes(blog.host_name)        
+        response = request_likes(blog.host_name)        
         response_list.append(response)  
             
     return response_list
 
-def _request_likes(blog_host_name):
-    ''' Helper for retreiving likes from tumblr. 
-        Given a base blog, makes the request.'''
+def request_likes(blog_host_name):
+    ''' Retrieve likes from tumblr for the given blog.'''
 
     # tumblr API request right here:
     response = requests.get(_likes_request_str(blog_host_name))
-    json=response.json()    
+    json = response.json()    
     ret = json['meta']['status']
     # Check for valid response
 
-    if (ret)==200:
+    if (ret) == 200:
         # Response OK, so parse json for juicy goodness
         errcode = _parse_likes_json(blog_host_name, json)
         
@@ -173,9 +170,7 @@ def _parse_post_json(blog_host_name, liked_post_json):
                                                  last_track = current_datetime)  
     tracking = Tracking(post = post_obj,
                         timestamp = current_datetime,
-                        sequence = updated_times_tracked,
-                        increment = post_obj.note_inc,
-                        count = post_count)
+                        sequence = updated_times_tracked)
     tracking.save()       
     return 0
 
