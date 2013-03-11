@@ -131,21 +131,23 @@ def _parse_post_json(blog_host_name, liked_post_json):
         img = "http://www.athgo.org/ablog/wp-content/uploads/2013/02/tumblr_logo.png"
         
         if liked_post_json['type'] == "text" or liked_post_json['type'] == "chat":    
-            img = "http://www.athgo.org/ablog/wp-content/uploads/2013/02/tumblr_logo.png"
-            txt = strip_tags(liked_post_json['body'].encode('utf-8'))[:100] + "..."
+            txt = strip_tags(liked_post_json['body'].encode('utf-8'))[:150] + "..."
         
         elif liked_post_json['type'] == "photo":
-            img = liked_post_json['photos'][0]['alt_sizes'][0]['url'],
-            txt = strip_tags(liked_post_json['caption'].encode('utf-8'))[:100] + "..."
+            img = liked_post_json['photos'][0]['alt_sizes'][0]['url']
+            txt = strip_tags(liked_post_json['caption'].encode('utf-8'))[:150] + "..."
             
         elif liked_post_json['type'] == "link":
-            txt = strip_tags(liked_post_json['description'].encode('utf-8'))[:100] + "..."
+            txt = strip_tags(liked_post_json['description'].encode('utf-8'))[:150] + "..."
             
         elif liked_post_json['type'] == "quote":
-            txt = strip_tags(liked_post_json['source'].encode('utf-8'))[:100] + "..."
+            txt = strip_tags(liked_post_json['source'].encode('utf-8'))[:150] + "..."
         
         elif liked_post_json['type'] == "answer":
-            txt = trip_tags(liked_post_json['answer'].encode('utf-8'))[:100] + "..."
+            txt = trip_tags(liked_post_json['answer'].encode('utf-8'))[:150] + "..."
+	    
+	elif liked_post_json['type'] == "audio" or liked_post_json['type'] == "video":
+            txt = trip_tags(liked_post_json['caption'].encode('utf-8'))[:150] + "..."
             
         post_obj = Post(url = post_url,
                         date = post_date,
