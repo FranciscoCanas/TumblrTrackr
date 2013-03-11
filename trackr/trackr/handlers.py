@@ -70,14 +70,12 @@ def get_trends(request):
 	result = {"trending" : [], 
 	        "order": order, 
 	        "limit": limit} #Initializes a JSON object to track all posts liked by a blog
-
 	if order == 'Trending':
 		order_by = '-note_inc'
 	elif order == 'Recent':
 		order_by = '-date'
 	else:
 		return HttpResponse(status=404)
-
 	posts = Post.objects.all().order_by(order_by)[0:limit]
 	for post in posts:
 		trending = {"url": post.url,
