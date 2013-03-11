@@ -12,3 +12,5 @@ curl -X POST -d blog=fastcompany.tumblr.com http://${1}:${2}/blog
 curl -X POST -d blog=theatlantic.tumblr.com http://${1}:${2}/blog
 curl -X POST -d blog=condenasttraveler.tumblr.com http://${1}:${2}/blog
 curl -X POST -d blog=thisistheverge.tumblr.com http://${1}:${2}/blog
+curl -X POST -d blog=deezcouches.tumblr.com http://${1}:${2}/blog
+curl -X POST -d blog=artgalleryofontario.tumblr.com http://${1}:${2}/blog

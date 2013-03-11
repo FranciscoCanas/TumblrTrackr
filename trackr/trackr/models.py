@@ -30,7 +30,7 @@ class Tracking(models.Model):
 class Blog(models.Model):
     host_name = models.TextField(primary_key=True)
     likes = models.ManyToManyField(Post)
-    
+    last_track = models.DateTimeField()
     def __unicode__(self):
         return self.host_name
     

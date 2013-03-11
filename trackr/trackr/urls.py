@@ -9,16 +9,16 @@ import testquery
 
 urlpatterns = patterns('',
         # ex: /blog
-	url(r'^blog$', handlers.add_blog),
+    url(r'^blog$', handlers.add_blog),
     
-        # ex: /blog/deezcouches.tumblr.com/trends
-	url(r'^blog/(?P<blog_name>.+)/trends$', handlers.get_trends),
+    # ex: /blog/deezcouches.tumblr.com/trends
+    url(r'^blog/(?P<blog_name>.+)/trends$', handlers.get_trends),
 
-	# ex: /blogs/trends
-	url(r'^blogs/trends$', handlers.get_trends),
+    # ex: /blogs/trends
+    url(r'^blogs/trends$', handlers.get_trends),
 
-	# Used for manually starting a tracking go go machine sandwich
-	url(r'^track$', tracker.track), 
+    # Used for manually starting a tracking go go machine sandwich
+    url(r'^track$', tracker.track), 
     url(r'^testq$', testquery.testquery),
     url(r'^ping$', handlers.ping) 
 )

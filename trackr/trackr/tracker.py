@@ -14,17 +14,13 @@ from models import Blog, Post, Tracking
 
 def track(request):
     ''' Used to manually start the tracking process for testing'''
-    # This is to ensure that the client doesn't try to track a blog
-    # more often than one hour. This might happen if the client discovers
-    # the tracker url.
-    #delta = datetime.datetime.now().replace(tzinfo=None) - Last_track.timestamp
-    #if (delta.total_seconds()/3600) < 1:
-        #return HttpResponse(status=404)
-    #else:
-        #GLOBAL_LAST_TRACK = datetime.datetime.now()
-        ## Used for starting the massive blog tracking batch job
+    # Make sure this is an authorized tracking request, man
+    key = request.REQUEST.get('key','')
+    if key!=pv.tracking_key:
+        return HttpResponse("Unauthorized")
+        
     response = retrieve_all_likes()
-    return HttpResponse(_response_list_to_str(response))
+    return HttpResponse(content=_response_list_to_str(response),status=200)
 
 def retrieve_all_likes():
     '''Retrieve a list of liked posts:
@@ -41,10 +37,15 @@ def retrieve_all_likes():
 
     # For each blog in Blogs:
     for blog in Blog.objects.all():
-        # Send AJAX request to tumblr.com to get da likes
-        response = request_likes(blog.host_name)        
-        response_list.append(response)  
-            
+        # This ensures we don't track blogs more than once an hour
+        delta = datetime.datetime.now().replace(tzinfo=None) - blog.last_track.replace(tzinfo=None)
+        if (delta.total_seconds()/3600) < 1:
+            ## Used for starting the massive blog tracking batch job
+            # Send AJAX request to tumblr.com to get da likes
+            response = request_likes(blog.host_name)        
+            response_list.append(response)  
+            blog.last_track = datetime.datetime.now()
+            blog.save()                    
     return response_list
 
 def request_likes(blog_host_name):
@@ -116,13 +117,14 @@ def _parse_post_json(blog_host_name, liked_post_json):
     ''' Takes the json from a post and extracts all its juicy goodness, then
         makes a database entry for it, if necessary.'''
     
-    # Example: liked_post_json['post_url'] to get the url
     blog_obj = Blog.objects.get(host_name = blog_host_name)
+    
+    # Example: liked_post_json['post_url'] to get the url
     post_url = liked_post_json['post_url']
     post_date = convert_date(liked_post_json['date'])
     post_count = liked_post_json['note_count']
     current_datetime = datetime.datetime.now().replace(tzinfo=utc)
- 
+    
     # Different posts have different types of text fields.
     text_field = {"text": "body",
                   "chat": "body",
@@ -132,16 +134,26 @@ def _parse_post_json(blog_host_name, liked_post_json):
                   "answer": "answer",
                   "audio": "caption",
                   "video": "caption"}
-    
+    # Set default image.
+    def_img = "http://www.athgo.org/ablog/wp-content/uploads/2013/02/tumblr_logo.png"
+                  
+    img_field = {"text": lambda: def_img,
+                  "chat": lambda: def_img,
+                  "photo": lambda:liked_post_json['photos'][0]['alt_sizes'][0]['url'],               
+                  "link": lambda: def_img,
+                  "quote": lambda: def_img,
+                  "answer": lambda: def_img,
+                  "audio": lambda: liked_post_json.get('album_art', def_img),
+                  "video": lambda: def_img}
+                  
     updated_times_tracked = 1
+    img = img_field[liked_post_json['type']]()
+    txt = strip_tags(liked_post_json[text_field[liked_post_json['type']]].encode('utf-8'))
+    # Reduce text length if too long.
+    if len(txt) > 100:
+        txt = txt[:100] + "..."
+    
     if (not Post.objects.filter(url = post_url).exists()):
-        # Set default image.
-        img = "http://www.athgo.org/ablog/wp-content/uploads/2013/02/tumblr_logo.png"
-        txt = strip_tags(liked_post_json[text_field[liked_post_json['type']]].encode('utf-8'))
-	# Reduce text length if too long.
-	if len(txt) > 100:
-	    txt = txt[:100] + "..."
-
         post_obj = Post(url = post_url,
                         date = post_date,
                         last_track = current_datetime,
@@ -152,8 +164,8 @@ def _parse_post_json(blog_host_name, liked_post_json):
         
         post_obj.save()
         blog_obj.likes.add(post_obj)  
-	blog_obj.save()
-	
+        blog_obj.save()
+    
     else:
         # update note_count and last_track.
         post_obj = Post.objects.get(url=post_url)
@@ -163,8 +175,8 @@ def _parse_post_json(blog_host_name, liked_post_json):
                                                  note_inc = post_count - prev_count,
                                                  note_count = post_count,
                                                  last_track = current_datetime)
-	post_obj.save()
-	
+        post_obj.save()
+    
     # Create new tracking object for post.
     tracking = Tracking(post = post_obj,
                         timestamp = current_datetime,
@@ -182,8 +194,8 @@ def _post_request_str(blog_host_name, post_id):
             '/posts?api_key=' + pv.api_key + '&id=' + post_id
 
 def convert_date(date):
-	''' Convert a date in string form into a datetime object. '''
-	
-	# example date string: "2013-03-13 12:20:00 EST"
-	
-	return datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S %Z').replace(tzinfo=utc)
+    ''' Convert a date in string form into a datetime object. '''
+    
+    # example date string: "2013-03-13 12:20:00 EST"
+    
+    return datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S %Z').replace(tzinfo=utc)

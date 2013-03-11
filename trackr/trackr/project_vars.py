@@ -10,6 +10,7 @@ api_key='UVsuuWUK99CX70DXIKylXXoCVo1QPvYzYPxKzN0GLTVxyd26bx'
 secret_tumblr_key='VPwM6sedu0OTYbXmxqln2a5IdSq49PqWjywxa5yDxAJgVlQB60'
 tumblr_url='http://api.tumblr.com/v2/'
 tumblr_domain_url='tumblr.com'
+tracking_key='superdupersecrettrackingkey'
 
 
 
