@@ -36,7 +36,7 @@ def get_blog_trends(request, blog_name):
 			            "tracking": get_timestamps(post)}
 			result["trending"].append(trending)
 	elif order == "Recent":
-		blog_likes = blog_obj.likes.order_by('-last_track')[0:limit] #QuerySet of liked posts with most recent tracking
+		blog_likes = blog_obj.likes.order_by('-date')[0:limit] #QuerySet of liked posts with most recent tracking
 		for post in blog_likes:
 			trending = {"url": post.url,
 			            "image": post.image,
