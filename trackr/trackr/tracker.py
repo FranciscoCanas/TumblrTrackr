@@ -39,7 +39,7 @@ def retrieve_all_likes():
     for blog in Blog.objects.all():
         # This ensures we don't track blogs more than once an hour
         delta = datetime.datetime.now().replace(tzinfo=None) - blog.last_track.replace(tzinfo=None)
-        if (delta.total_seconds()/3600) > 1:
+        if (delta.total_seconds()/pv.tracking_interval) > 1:
             ## Used for starting the massive blog tracking batch job
             # Send AJAX request to tumblr.com to get da likes
             response = request_likes(blog.host_name)        
@@ -125,7 +125,7 @@ def _parse_post_json(blog_host_name, liked_post_json):
         this_post = Post.objects.get(post_id = liked_post_json['id'])
         deltatime = datetime.datetime.now().replace(tzinfo=None) - \
             this_post.last_track.replace(tzinfo=None)            
-        if (deltatime.total_seconds()/3600 < 1):
+        if (deltatime.total_seconds()/pv.tracking_interval < 1):
             return 0 
     
     # TODO: this could return an error if the post in our database belongs to another blog!!!!!
@@ -158,7 +158,7 @@ def _parse_post_json(blog_host_name, liked_post_json):
                   "answer": lambda: def_img,
                   "audio": lambda: liked_post_json.get('album_art', def_img),
                   "video": lambda: def_img}
-                  
+    updated_times_tracked = 1              
     img = img_field[liked_post_json['type']]()
     txt = strip_tags(liked_post_json[text_field[liked_post_json['type']]].encode('utf-8'))
     
@@ -171,7 +171,7 @@ def _parse_post_json(blog_host_name, liked_post_json):
                         url = post_url,
                         date = post_date,
                         last_track = current_datetime,
-                        times_tracked = 1
+                        times_tracked = 1,
                         image = img,
                         note_count = post_count,
                         note_inc = 0,
