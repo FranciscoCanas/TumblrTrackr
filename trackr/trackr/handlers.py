@@ -71,7 +71,7 @@ def get_trends(request, blog_name=None):
     elif order == "Recent":
         post_list = sorted(post_list, key=lambda k: k['date'], reverse=True)
     post_list = post_list[0:int(limit)]
-    result = {order.lower() : post_list, 
+    result = {"trending" : post_list, 
             "order": order, 
             "limit": limit}
     return HttpResponse(content=json.dumps(result), status=200)

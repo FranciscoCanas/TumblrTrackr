@@ -12,7 +12,7 @@ tumblr_url='http://api.tumblr.com/v2/'
 tumblr_domain_url='tumblr.com'
 tracking_key='superdupersecrettrackingkey'
 
-tracking_interval=1
+tracking_interval=720
 
 
 

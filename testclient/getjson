@@ -1,0 +1,4 @@
+#!/bin/sh
+rm -f model.json
+curl "http://redwolf.cdf.toronto.edu:30945/blogs/trends?order=Trending&limit=50" > model.json
+firefox client.html
