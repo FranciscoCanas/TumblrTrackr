@@ -119,19 +119,20 @@ def _parse_post_json(blog_host_name, liked_post_json):
     
     # Check the last time this post was tracked and ignore if 
     # it's within the last hour.
-    post_id = liked_post_json['id']
-    new_post = not Post.objects.filter(post_id = post_id).exists()
+    new_post = not Post.objects.filter(post_id = liked_post_json['id']).exists()
     
     if (not new_post):
-        this_post = Post.objects.get(post_id = post_id)
+        this_post = Post.objects.get(post_id = liked_post_json['id'])
         deltatime = datetime.datetime.now().replace(tzinfo=None) - \
             this_post.last_track.replace(tzinfo=None)            
-        if (deltatime.total_seconds()<3600):
+        if (deltatime.total_seconds()/3600 < 1):
             return 0 
-        
+    
+    # TODO: this could return an error if the post in our database belongs to another blog!!!!!
     blog_obj = Blog.objects.get(host_name = blog_host_name)
     
     # Example: liked_post_json['post_url'] to get the url
+    post_id = liked_post_json['id']
     post_url = liked_post_json['post_url']
     post_date = convert_date(liked_post_json['date'])
     post_count = liked_post_json['note_count']
@@ -158,7 +159,6 @@ def _parse_post_json(blog_host_name, liked_post_json):
                   "audio": lambda: liked_post_json.get('album_art', def_img),
                   "video": lambda: def_img}
                   
-    updated_times_tracked = 1
     img = img_field[liked_post_json['type']]()
     txt = strip_tags(liked_post_json[text_field[liked_post_json['type']]].encode('utf-8'))
     
@@ -171,6 +171,7 @@ def _parse_post_json(blog_host_name, liked_post_json):
                         url = post_url,
                         date = post_date,
                         last_track = current_datetime,
+                        times_tracked = 1
                         image = img,
                         note_count = post_count,
                         note_inc = 0,
@@ -194,7 +195,7 @@ def _parse_post_json(blog_host_name, liked_post_json):
     # Create new tracking object for post.
     tracking = Tracking(post = post_obj,
                         timestamp = current_datetime,
-                        sequence = updated_times_tracked)
+                        sequence = updated_times_tracked + 1)
     tracking.save()
     
     return 0
