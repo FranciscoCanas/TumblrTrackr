@@ -32,14 +32,12 @@ def get_trends(request, blog_name=None):
         return HttpResponse(content="Order not specified.", status=404) 
     
     #Initialize a JSON object that will contain trends.
-    result = {order.lower() : [], 
-            "order": order, 
-            "limit": limit}
+    post_list = []
     
     if order == "Trending":
-        orderby = '-note_inc'
+        orderby = 'note_inc'
     elif order == "Recent":
-        orderby = '-date'
+        orderby = 'date'
     else:
         return HttpResponse(content=order + " is not a valid order.", status=404)   
     
@@ -51,10 +49,10 @@ def get_trends(request, blog_name=None):
         except ObjectDoesNotExist:
             return HttpResponse(content="Requested blog is not being tracked", status=404);
             
-        posts = blog_obj.likes.order_by(orderby)[0:limit]
+        posts = blog_obj.likes.all()
     else:   
         # Get liked posts for all blogs.
-        posts = Post.objects.all().order_by(orderby)[0:limit]
+        posts = Post.objects.all()
     
     # QuerySet of liked posts with sorted by either '-note_inc' or 'date',
     # depending on order parameter.
@@ -66,8 +64,16 @@ def get_trends(request, blog_name=None):
              "last_track": '{:%Y-%m-%d %H:%M:%S %Z}'.format(post.last_track),
              "last_count": post.note_count,
              "tracking": get_timestamps(post)}
-        result[order.lower()].append(p)
-
+        post_list.append(p)
+    
+    if order == "Trending":
+        post_list = sorted(post_list, key=lambda k: k['tracking'][0]['increment'], reverse=True)
+    elif order == "Recent":
+        post_list = sorted(post_list, key=lambda k: k['date'], reverse=True)
+    post_list = post_list[0:int(limit)]
+    result = {order.lower() : post_list, 
+            "order": order, 
+            "limit": limit}
     return HttpResponse(content=json.dumps(result), status=200)
 
 def get_timestamps(post):
@@ -82,7 +88,6 @@ def get_timestamps(post):
         lst.append(tdict)
         
     # Return timestamps sorted by descending sequence number
-    print lst
     return sorted(lst, key=lambda k: k['sequence'], reverse=True) 
     
 def ping(request):
