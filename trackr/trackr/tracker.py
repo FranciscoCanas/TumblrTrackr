@@ -34,17 +34,17 @@ def retrieve_all_likes():
         - liked_count: Total number of liked posts.'''      
 
     response_list = []
-
     # For each blog in Blogs:
     for blog in Blog.objects.all():
         # This ensures we don't track blogs more than once an hour
-        delta = datetime.datetime.now().replace(tzinfo=None) - blog.last_track.replace(tzinfo=None)
+        delta = datetime.datetime.now().replace(tzinfo=utc) - blog.last_track.replace(tzinfo=utc)
         if (delta.total_seconds()/pv.tracking_interval) > 1:
+            
             ## Used for starting the massive blog tracking batch job
             # Send AJAX request to tumblr.com to get da likes
             response = request_likes(blog.host_name)        
             response_list.append(response)  
-            blog.last_track = datetime.datetime.now()
+            blog.last_track = datetime.datetime.now().replace(tzinfo=utc)
             blog.save()                    
     return response_list
 
@@ -52,6 +52,7 @@ def request_likes(blog_host_name):
     ''' Retrieve likes from tumblr for the given blog.'''
     # tumblr API request right here:
     response = requests.get(_likes_request_str(blog_host_name))
+    # Check if valid tumblr
     json = response.json()    
     ret = json['meta']['status']
     # Check for valid response
@@ -76,6 +77,8 @@ def _parse_likes_json(blog_host_name, likes_json):
     # add this particular post to this blog's likes.
     try:
         blog_obj = Blog.objects.get(host_name=blog_host_name)
+        blog_obj.last_track = datetime.datetime.now().replace(tzinfo=utc)
+        blog_obj.save()
     except ObjectDoesNotExist:
         return (blog_host_name, 'Blog Does Not Exist')
 
@@ -123,8 +126,8 @@ def _parse_post_json(blog_host_name, liked_post_json):
     
     if (not new_post):
         this_post = Post.objects.get(post_id = liked_post_json['id'])
-        deltatime = datetime.datetime.now().replace(tzinfo=None) - \
-            this_post.last_track.replace(tzinfo=None)            
+        deltatime = datetime.datetime.now().replace(tzinfo=utc) - \
+            this_post.last_track.replace(tzinfo=utc)            
         if (deltatime.total_seconds()/pv.tracking_interval < 1):
             return 0 
     
@@ -190,12 +193,12 @@ def _parse_post_json(blog_host_name, liked_post_json):
                                                  note_inc = post_count - prev_count,
                                                  note_count = post_count,
                                                  last_track = current_datetime)
-        #post_obj.save()
-        print "Saved was here man"
     # Create new tracking object for post.
     tracking = Tracking(post = post_obj,
                         timestamp = current_datetime,
-                        sequence = updated_times_tracked)
+                        increment = post_obj.note_inc,
+                        sequence = updated_times_tracked,
+                        count = post_obj.note_count)
     tracking.save()
     
     return 0

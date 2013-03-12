@@ -25,6 +25,8 @@ class Tracking(models.Model):
     post = models.ForeignKey(Post)
     timestamp = models.DateTimeField()
     sequence = models.IntegerField()
+    count = models.IntegerField()
+    increment = models.IntegerField(default=0)
 
 
 #Table of all the blogs being tracked

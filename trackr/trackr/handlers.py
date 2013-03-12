@@ -3,20 +3,22 @@ from django.db.models import Max
 import datetime, json
 from django.core.exceptions import ObjectDoesNotExist
 from trackr.models import *
+import requests
 import tracker
 
 
 def add_blog(request):
     ''' Add a new blog to our tracking list.''' 
-    
     blog_name = request.REQUEST['blog'] # Using .REQUEST instead of .POST for testing
     if (not Blog.objects.filter(host_name = blog_name).exists()):
-        b = Blog(host_name = blog_name,last_track=datetime.datetime.now())
-        b.save()
         # We track a blog for the first time as soon as an add blog request
         # is made for that particular blog.
+        response = requests.get(tracker._likes_request_str(blog_name))
+        if  response.status_code == 404:
+            return HttpResponse(content="Not a valid tumblr url",status=404)
+        b = Blog(host_name = blog_name,last_track=datetime.datetime.utcnow())
+        b.save()
         tracker.request_likes(blog_name)
-    
     return HttpResponse(content=blog_name, status=200)
 
 def get_trends(request, blog_name=None):
@@ -61,7 +63,7 @@ def get_trends(request, blog_name=None):
              "image": post.image,
              "text": post.text,
              "date": '{:%Y-%m-%d %H:%M:%S %Z}'.format(post.date),
-             "last_track": '{:%Y-%m-%d %H:%M:%S} EST'.format(post.last_track),
+             "last_track": '{:%Y-%m-%d %H:%M:%S %Z}'.format(post.last_track),
              "last_count": post.note_count,
              "tracking": get_timestamps(post)}
         result[order.lower()].append(p)
@@ -75,8 +77,8 @@ def get_timestamps(post):
     for t in Tracking.objects.filter(post = post.post_id):
         tdict = {"timestamp" : '{:%Y-%m-%d %H:%M:%S %Z}'.format(t.timestamp),
                  "sequence" : t.sequence,
-                 "increment" : post.note_inc,
-                 "count" : post.note_count}
+                 "increment" : t.increment,
+                 "count" : t.count}
         lst.append(tdict)
         
     # Return timestamps sorted by descending sequence number
