@@ -39,7 +39,7 @@ def retrieve_all_likes():
     for blog in Blog.objects.all():
         # This ensures we don't track blogs more than once an hour
         delta = datetime.datetime.now().replace(tzinfo=None) - blog.last_track.replace(tzinfo=None)
-        if (delta.total_seconds()/3600) < 1:
+        if (delta.total_seconds()/3600) > 1:
             ## Used for starting the massive blog tracking batch job
             # Send AJAX request to tumblr.com to get da likes
             response = request_likes(blog.host_name)        
