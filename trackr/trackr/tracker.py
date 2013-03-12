@@ -17,7 +17,7 @@ def track(request):
     # Make sure this is an authorized tracking request, man
     key = request.REQUEST.get('key','')
     if key!=pv.tracking_key:
-        return HttpResponse("Unauthorized")
+        return HttpResponse(content="Unauthorized", status=401)
         
     response = retrieve_all_likes()
     return HttpResponse(content=_response_list_to_str(response),status=200)
