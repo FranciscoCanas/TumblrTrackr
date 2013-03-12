@@ -190,12 +190,12 @@ def _parse_post_json(blog_host_name, liked_post_json):
                                                  note_inc = post_count - prev_count,
                                                  note_count = post_count,
                                                  last_track = current_datetime)
-        post_obj.save()
-    
+        #post_obj.save()
+        print "Saved was here man"
     # Create new tracking object for post.
     tracking = Tracking(post = post_obj,
                         timestamp = current_datetime,
-                        sequence = updated_times_tracked + 1)
+                        sequence = updated_times_tracked)
     tracking.save()
     
     return 0
